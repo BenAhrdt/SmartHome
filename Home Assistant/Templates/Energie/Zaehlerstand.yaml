@@ -1,0 +1,119 @@
+- trigger:
+    - platform: state
+      entity_id: sensor.haupmessungen_netzbezug
+      not_to:
+      - "unavailable"
+      - "unknown"
+      - ""
+      - "0"
+  sensor:
+    - name: "Netzbezug Zählerstand (nur steigend)"
+      unique_id: netzbezug_filtered
+      unit_of_measurement: "Wh"
+      device_class: energy
+      state_class: total_increasing
+      icon: mdi:counter
+      state: >
+        {% set new = trigger.to_state.state | float(0) %}
+        {% set old = states('sensor.netzbezug_zaehlerstand_nur_steigend') | float(0) %}
+        {% if new > old %}
+        {{ new }}
+        {% else %}
+        {{ old }}
+        {% endif %}
+        
+- trigger:
+    - platform: state
+      entity_id: sensor.haupmessungen_netzlieferung
+      not_to:
+      - "unavailable"
+      - "unknown"
+      - ""
+      - "0"
+  sensor:
+    - name: "Netzlieferung Zählerstand (nur steigend)"
+      unique_id: netzlieferung_filtered
+      unit_of_measurement: "Wh"
+      device_class: energy
+      state_class: total_increasing
+      icon: mdi:counter
+      state: >
+        {% set new = trigger.to_state.state | float(0) %}
+        {% set old = states('sensor.netzlieferung_zaehlerstand_nur_steigend') | float(0) %}
+        {% if new > old %}
+        {{ new }}
+        {% else %}
+        {{ old }}
+        {% endif %}
+        
+- trigger:
+    - platform: state
+      entity_id: sensor.pvgarage_erzeugung
+      not_to:
+      - "unavailable"
+      - "unknown"
+      - ""
+      - "0"
+  sensor:
+    - name: "PV Garage Zählerstand (nur steigend)"
+      unique_id: pvgarage_erzeugung_filtered
+      unit_of_measurement: "Wh"
+      device_class: energy
+      state_class: total_increasing
+      icon: mdi:counter
+      state: >
+        {% set new = trigger.to_state.state | float(0) %}
+        {% set old = states('sensor.pv_garage_zaehlerstand_nur_steigend') | float(0) %}
+        {% if new > old %}
+        {{ new }}
+        {% else %}
+        {{ old }}
+        {% endif %}
+
+- trigger:
+    - platform: state
+      entity_id: sensor.speicher_laden
+      not_to:
+      - "unavailable"
+      - "unknown"
+      - ""
+      - "0"
+  sensor:
+    - name: "Speicher laden Zählerstand (nur steigend)"
+      unique_id: speicher_laden_filtered
+      unit_of_measurement: "Wh"
+      device_class: energy
+      state_class: total_increasing
+      icon: mdi:counter
+      state: >
+        {% set new = trigger.to_state.state | float(0) %}
+        {% set old = states('sensor.speicher_laden_zaehlerstand_nur_steigend') | float(0) %}
+        {% if new > old %}
+        {{ new }}
+        {% else %}
+        {{ old }}
+        {% endif %}
+        
+- trigger:
+    - platform: state
+      entity_id: sensor.speicher_entladen
+      not_to:
+      - "unavailable"
+      - "unknown"
+      - ""
+      - "0"
+  sensor:
+    - name: "Speicher entladen Zählerstand (nur steigend)"
+      unique_id: speicher_entladen_filtered
+      unit_of_measurement: "Wh"
+      device_class: energy
+      state_class: total_increasing
+      icon: mdi:counter
+      state: >
+        {% set new = trigger.to_state.state | float(0) %}
+        {% set old = states('sensor.speicher_entladen_zaehlerstand_nur_steigend') | float(0) %}
+        {% if new > old %}
+        {{ new }}
+        {% else %}
+        {{ old }}
+        {% endif %}
