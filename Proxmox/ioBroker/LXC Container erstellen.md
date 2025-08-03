@@ -24,7 +24,8 @@ timedatectl set-timezone Europe/Berlin
 ### 2.3 eigenen user anlegen und zum superuser machen
 ```bash
 adduser ben
-```(passwort eintragen, wenn gefragt)
+```
+(passwort eintragen, wenn gefragt)
 
 ```bash
 usermod -aG sudo ben
