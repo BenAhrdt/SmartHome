@@ -1,3 +1,5 @@
+# Einbindung von Templates in Home Assistant
+
 Um gewisse Funktionen in Home Assistant realisieren zu können,
 benötigt man Templates.
 
