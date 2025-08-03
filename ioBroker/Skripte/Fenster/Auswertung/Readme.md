@@ -20,6 +20,7 @@ In dem Tab Kategorien, wird unter den funktionen die Enum "Fenster" angelegt.
 ### 2.2 Zuweisen der Datenpunkte
 Wie hier zu sehen und auch oben beschrieben, kann direkt der ganze Ordner (in diesem Fall ein Channel) der Kategorie zugewiesen werden.
 Dies ermöglicht es, dass für weiter Abfragen bspw. auch der Batteriewert die Kategory Fenster zugewiesen ist.
+
 <img width="1849" height="610" alt="image" src="https://github.com/user-attachments/assets/7438686a-c7f1-4341-985c-926460ac6f84" />
 
 
