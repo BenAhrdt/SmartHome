@@ -1,0 +1,155 @@
+esphome:
+  name: esp32-radar-ld2450
+  friendly_name: ESP32 Radar Wohnzimmer
+  name_add_mac_suffix: false
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+logger:
+
+api:
+
+ota:
+  platform: esphome
+
+wifi:
+  networks:
+    - ssid: "Talstrasse 1A"
+      password: "pass4talstrasse1a"
+
+# UART für LD2450 – ggf. Pins anpassen
+uart:
+  rx_pin: GPIO16
+  tx_pin: GPIO17
+  baud_rate: 256000
+
+# LD2450-Komponente initialisieren (externe Komponenten nur notwendig, wenn sie nicht in ESPHome enthalten ist)
+ld2450:
+  id: ld2450_radar
+  throttle: 1000ms
+
+binary_sensor:   
+  - platform: ld2450
+    ld2450_id: ld2450_radar
+    has_target:
+      name: Presence
+    has_moving_target:
+      name: Moving Target
+    has_still_target:
+      name: Still Target
+
+sensor:
+  - platform: ld2450
+    ld2450_id: ld2450_radar
+    target_count:
+      name: Presence Target Count
+    still_target_count:
+      name: Still Target Count
+    moving_target_count:
+      name: Moving Target Count
+    target_1:
+      x:
+        name: Target-1 X
+      y:
+        name: Target-1 Y
+      speed:
+        name: Target-1 Speed
+      angle:
+        name: Target-1 Angle
+      distance:
+        name: Target-1 Distance
+      resolution:
+        name: Target-1 Resolution
+    target_2:
+      x:
+        name: Target-2 X
+      y:
+        name: Target-2 Y
+      speed:
+        name: Target-2 Speed
+      angle:
+        name: Target-2 Angle
+      distance:
+        name: Target-2 Distance
+      resolution:
+        name: Target-2 Resolution
+    target_3:
+      x:
+        name: Target-3 X
+      y:
+        name: Target-3 Y
+      speed:
+        name: Target-3 Speed
+      angle:
+        name: Target-3 Angle
+      distance:
+        name: Target-3 Distance
+      resolution:
+        name: Target-3 Resolution
+    zone_1:
+      target_count:
+        name: Zone-1 All Target Count
+      still_target_count:
+        name: Zone-1 Still Target Count
+      moving_target_count:
+        name: Zone-1 Moving Target Count
+    zone_2:
+      target_count:
+        name: Zone-2 All Target Count
+      still_target_count:
+        name: Zone-2 Still Target Count
+      moving_target_count:
+        name: Zone-2 Moving Target Count
+    zone_3:
+      target_count:
+        name: Zone-3 All Target Count
+      still_target_count:
+        name: Zone-3 Still Target Count
+      moving_target_count:
+        name: Zone-3 Moving Target Count
+
+number:
+  - platform: ld2450
+    ld2450_id: ld2450_radar
+    presence_timeout:
+      name: "Timeout"
+    zone_1:
+      x1:
+        name: Zone-1 X1
+      y1:
+        name: Zone-1 Y1
+      x2:
+        name: Zone-1 X2
+      y2:
+        name: Zone-1 Y2
+    zone_2:
+      x1:
+        name: Zone-2 X1
+      y1:
+        name: Zone-2 Y1
+      x2:
+        name: Zone-2 X2
+      y2:
+        name: Zone-2 Y2
+    zone_3:
+      x1:
+        name: Zone-3 X1
+      y1:
+        name: Zone-3 Y1
+      x2:
+        name: Zone-3 X2
+      y2:
+        name: Zone-3 Y2
+
+
+# Optional: MQTT, falls du das nutzen möchtest
+# mqtt:
+#   broker: 192.168.1.210
+#   port: 1884
+#   username: iobroker
+#   password: Bee3n21!
+#   discovery: false
+#   topic_prefix: esp32-radar-ld2450
