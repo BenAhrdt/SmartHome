@@ -14,6 +14,7 @@ Zusätzlich bringt eine Kombination aus Kategorie und Rolle die Möglichkeit, da
 Kategorie zuweist und nur die Rolle des Sensors bspw. beachtet wird.
 ### 2.1 Kategorie anlegen
 In dem Tab Kategorien, wird unter den funktionen die Enum "Fenster" angelegt.
+
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/76f0659a-77a6-483f-bac4-d9afe89c4c59" />
 
 ### 2.2 Zuweisen der Datenpunkte
