@@ -38,3 +38,5 @@ const idFensterBadezimmer = 'alias.0.Talstrasse1A.Badezimmer.Fenster.ACTUAL';
 ## 4. Skript nach eigenen wünschen mit verschiedenen Funktionen ausstatten und starten
 Nachdem alle Vorbereitungen abgechlossen sind kann das Skript, welches angepasst wurde gestartet werden.
 In den einzelnen Funktionen (Bspw. "windowOpened"), können eigene Funktionen realisiert werden.
+In meinem Beispiel, werden hier je nach Fenster verschiedene Ausgaben über Alexa gemacht.
+(Diese Funktionen sind natürlich durch die eigenen Wünsche und Vorhaben zu ersetzen).
