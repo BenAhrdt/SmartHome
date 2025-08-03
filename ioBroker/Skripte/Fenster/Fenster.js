@@ -29,7 +29,7 @@ let offeneFenster = {};
 let geschlosseneFenster = {};
 
 //Arrays bei Skriptstart anlegen
-$(`state(${enumtypeFunctions}=${enumFenster})[role=sensor.window]`).each((id)=>{
+$(`state(functions=fenster)[role=sensor.window]`).each((id)=>{
     //objekt und state holen
     let obj = getObject(id);
     let state = getState(id);
@@ -68,7 +68,7 @@ function assignObject(obj,state){
 ******************************************************************************************************* */
 
 // Abfrage, ob sich ein Fensterzustand geändert hat
-$(`state(${enumtypeFunctions}=${enumFenster})[role=sensor.window]`).on((dp)=>{
+$(`state(functions=fenster)[role=sensor.window]`).on((dp)=>{
     // Objekt holen und zuweisen
     let obj = getObject(dp.id);
     assignObject(obj,dp.state);
