@@ -31,3 +31,6 @@ const LueftungsFenster = {
                 }
                         };
 </pre>
+
+!!! Auch hier werden entsprechende Alexa Funktionen, welche ich selbst in meinen Globalen Skripten erstell habe verwendet.
+Sollten diese nicht vorhanden sein, sollten diese an der entsprechenden Stelle ausgetauscht werden.
