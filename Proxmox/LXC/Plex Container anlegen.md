@@ -17,6 +17,7 @@ apt-get install nfs-common
 ```bash
 nano /etc/fstab
 ```
+Inhalt der Datei:
 ```bash
 192.168.2.80:/volume1/video    /mnt/data nfs auto,rw,sync,hard,intr 0 0
 ```
