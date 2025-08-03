@@ -21,7 +21,7 @@ apt update && sudo apt upgrade -y && apt autoremove -y
 timedatectl set-timezone Europe/Berlin
 ```
 
-### 2.3 eigenen user anlegen und zum superuser machen
+### 2.3 Eigenen user anlegen und zum superuser machen
 ```bash
 adduser ben
 ```
