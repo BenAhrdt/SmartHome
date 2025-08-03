@@ -7,6 +7,7 @@ Ich habe mich dazu entschieden einen Ordner "templates" anzulegen und direkt den
 
 Das Einbindung erfolgt durch:
 
-```yaml
+`
 # Templates aus dem Ordner templates inkludieren
 template: !include_dir_merge_list templates/
+`
