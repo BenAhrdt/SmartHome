@@ -1,4 +1,4 @@
-# Zuweisen einer excterenn Temeratur zu einem Mclimate Vicki
+# Zuweisen einer externen Temeratur zu einem Mclimate Vicki
 Bei einem Mclimate Vicki ist es möglich eine über einen externen Sensor gemessene Temperatur zuzuweisen und diese antatt der von Vicki selbst gemessenen Temperatur zu nutzen.
 <br/>
 Dies kann hilfreich, oder auch notwendig sein, wenn das Heizungsthermostat bspw. eingeengt nd / oder in der Abluft des Heizkörpers sitzt und somit die Temperaturmessung verfälscht wird.
