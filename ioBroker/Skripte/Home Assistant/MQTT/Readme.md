@@ -18,3 +18,20 @@ Das Topic sollte folgendermaßen aufgebaut sein:
 Beginnen sollte das Topic mit "iobroker/" (Dies ist im Skript konfigurierbar)
 ### 1.1.2 Gerät
 Der Zweite Eintrag ist der Name des Geräts, welches erzeugt werden soll. (Bspw. hier "Talstrasse1a/")
+### 1.1.3 Softiges
+Nachfolgend können beliebig viele Verschachtungen (man sollte es nicht übertreiben) genutzt werden,
+um seine Entität strukturiert aufzubauen. (hier "Leistung/")
+### 1.1.4 Entitätsname
+Als letzten Eintrag im Topic wir der Name der Entität erwarten, welche erzeugt werden soll. (Hier nicht zu sehen "Gesamt")
+
+## 1.2 Publish
+### 1.2.1 Aktiviert
+Die Publish Option aktiviert man, wenn Daten von ioBroker zu Home Assistant gesendet werden sollen. (Dies ist in der Regel immer der Fall).
+### 1.2.2 Retain
+Wird die Retain Option aktiviert, so wird die letzte MQTT Message im Broker gespeichert und Home Assistant, kann sich diese bei einem Neustart abholen.
+(Empfohlen [Zumindest für Daten, die nicht regelmäßig gesendet werden])
+
+# 1.3 Abonnieren
+### 1.3.1 Aktiviert
+Das Abonnieren bitte aktivieren, wenn die Daten in beide Richtungen schreibbar sein sollen.
+(sowohl ioBroker als auch Home Assistant können auf den State schreiben).
