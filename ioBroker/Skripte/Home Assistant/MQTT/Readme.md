@@ -3,13 +3,12 @@
 Um von ioBroker Daten nach Home Assistant senden, oder auch bidirektional agieren zu können, kann man eine MQTT Verbindung nutzen.
 Hier wird die Verwendung des Adapters MQTT-Client beschrieben.
 <br/>
+<img width="292" height="232" alt="image" src="https://github.com/user-attachments/assets/4a17d4f9-19a8-4b2f-98de-e343bf377838" />
+<br/>
 <br/>
 Die Einbindung erfolgt mittels Discovery topics und payloads. Hierzu muss diese Funktion in Home Assistant aktiviert sein (standard).
 <br/>
 <img width="571" height="152" alt="image" src="https://github.com/user-attachments/assets/79d12c5d-5b64-45b6-9ab3-d4407b9ad827" />
-
-
-<img width="292" height="232" alt="image" src="https://github.com/user-attachments/assets/4a17d4f9-19a8-4b2f-98de-e343bf377838" />
 
 Um Daten übertragen zu können, geht man im ioBroker auf den States zu dem Zahnrad:
 <img width="1443" height="44" alt="image" src="https://github.com/user-attachments/assets/edf81ddb-0cb0-4ecf-b8dd-7885c0272746" />
