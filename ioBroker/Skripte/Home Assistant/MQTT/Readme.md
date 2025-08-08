@@ -15,6 +15,7 @@ Nun kann man die entsprechenden Einstellungen vornehmen:
 <br/>
 ## 1.1 Topic
 Bei den Topic sollte darauf geachtet werden, dass keine Umlaute und Leerzeichen verwendet werden.
+<br/>
 Das Topic sollte folgendermaßen aufgebaut sein:
 ### 1.1.1 Prefix
 Beginnen sollte das Topic mit "iobroker/" (Dies ist im Skript konfigurierbar)
