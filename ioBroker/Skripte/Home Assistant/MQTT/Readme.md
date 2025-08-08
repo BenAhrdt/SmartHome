@@ -11,7 +11,8 @@ Die Einbindung erfolgt mittels Discovery topics und payloads. Hierzu muss diese 
 <img width="571" height="152" alt="image" src="https://github.com/user-attachments/assets/79d12c5d-5b64-45b6-9ab3-d4407b9ad827" />
 
 Um Daten übertragen zu können, geht man im ioBroker auf den States zu dem Zahnrad:
-<img width="1443" height="44" alt="image" src="https://github.com/user-attachments/assets/edf81ddb-0cb0-4ecf-b8dd-7885c0272746" />
+<br/>
+<img width="1441" height="37" alt="image" src="https://github.com/user-attachments/assets/ce0de63b-6555-4b84-9767-8c556407378f" />
 
 ## 1. Eintragen der Daten in den MQTT-Client
 Nun kann man die entsprechenden Einstellungen vornehmen:
