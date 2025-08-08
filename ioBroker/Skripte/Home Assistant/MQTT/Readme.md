@@ -32,8 +32,8 @@ Die Publish Option aktiviert man, wenn Daten von ioBroker zu Home Assistant gese
 ### 1.2.2 Retain
 Wird die Retain Option aktiviert, so wird die letzte MQTT Message im Broker gespeichert und Home Assistant, kann sich diese bei einem Neustart abholen.
 (Empfohlen [Zumindest für Daten, die nicht regelmäßig gesendet werden])
-
-
+<br/>
+<br/>
 ## 1.3 Abonnieren
 ### 1.3.1 Aktiviert
 Das Abonnieren bitte aktivieren, wenn die Daten in beide Richtungen schreibbar sein sollen.
