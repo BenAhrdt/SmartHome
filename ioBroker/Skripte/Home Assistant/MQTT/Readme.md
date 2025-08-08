@@ -38,3 +38,6 @@ Wird die Retain Option aktiviert, so wird die letzte MQTT Message im Broker gesp
 ### 1.3.1 Aktiviert
 Das Abonnieren bitte aktivieren, wenn die Daten in beide Richtungen schreibbar sein sollen.
 (sowohl ioBroker als auch Home Assistant können auf den State schreiben).
+
+## 1.4 Beispiel
+Ein Topic sieht also Bspw. so aus: iobroker/Talstrasse1a/Leistung/Gesamt
