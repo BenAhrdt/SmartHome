@@ -2,6 +2,12 @@
 
 Um von ioBroker Daten nach Home Assistant senden, oder auch bidirektional agieren zu können, kann man eine MQTT Verbindung nutzen.
 Hier wird die Verwendung des Adapters MQTT-Client beschrieben.
+<br/>
+<br/>
+Die Einbindung erfolgt mittels Discovery topics und payloads. Hierzu muss diese Funktion in Home Assistant aktiviert sein (standard).
+<br/>
+<img width="571" height="152" alt="image" src="https://github.com/user-attachments/assets/79d12c5d-5b64-45b6-9ab3-d4407b9ad827" />
+
 
 <img width="292" height="232" alt="image" src="https://github.com/user-attachments/assets/4a17d4f9-19a8-4b2f-98de-e343bf377838" />
 
@@ -68,5 +74,24 @@ Dier Entitätsname Waermepumpe, bezieht sich hier auf den Name der climate entit
 
 Der letzte Punkt AllowCreationEntityWithUsedTopics gibt an, ob die Topics, welche in den komplexeren Entitäten verwendet wurden,
 auch noch separat ezeugt werden sollen. (Hier im Beispiel die Solltemperatuzr, die Isttemperatur und der Mode.
+
+# 3 Ausführen der Skripte
+## 3.1 Ertstes Ausführen
+Zuerste muss der Definitions Skript ausgeführt werden.
+<br/>
+Dies erzeugt die notwendigen definierten States.
+<br/>
+Im Anschluss, kann einmal manuell das Discovery Skript gestartet werden.
+<br/>
+Nach dem ersten Durchlauf, sollte in Home Assistant ein Gerät mit dem Namen Discovery und den beiden Entitäten Start und Fortschritt erzeugt worden sein.
+<br/>
+<img width="145" height="63" alt="image" src="https://github.com/user-attachments/assets/e0c9dc72-778e-4783-9986-7056a8a409b5" />
+<br/>
+<img width="333" height="388" alt="image" src="https://github.com/user-attachments/assets/ddfc1368-a5c6-4472-afbb-fec767b1dcb7" />
+<br/>
+Mit den Startbutton, kann ein Synchronieren der in ioBroker konfigurieren States mittels MQTT angestoßen werden.
+<br/>
+Der Fortschritt gibt an, wie weit das Skript in der Abarbeitung fortgeschritten ist.
+
 
 
