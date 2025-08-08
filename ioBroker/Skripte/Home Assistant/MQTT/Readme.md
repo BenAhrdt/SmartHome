@@ -59,4 +59,14 @@ Aktuell werden Entitäten mit folgenden Typen unterstützt:
 
 <img width="517" height="405" alt="image" src="https://github.com/user-attachments/assets/b3194721-b2c9-4bbc-bda4-765cda6663d1" />
 
+Die hier eingestellten Werte wie bspw. Gerätename und Entitätsname müssen natürlich separat im jeweiligen State als Topic eingetragen sein.
+Ein Beispiel für die Topic des Temperaturistwerts wäre hier: iobroker/Pool/Temperaturistwert
+<br/>
+Dier Entitätsname Waermepumpe, bezieht sich hier auf den Name der climate entität.
+<br/>
+<img width="306" height="63" alt="image" src="https://github.com/user-attachments/assets/6ac72774-1c32-4620-8733-49abc0d91c5f" />
+
+Der letzte Punkt AllowCreationEntityWithUsedTopics gibt an, ob die Topics, welche in den komplexeren Entitäten verwendet wurden,
+auch noch separat ezeugt werden sollen. (Hier im Beispiel die Solltemperatuzr, die Isttemperatur und der Mode.
+
 
