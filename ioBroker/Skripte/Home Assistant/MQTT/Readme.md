@@ -43,3 +43,20 @@ Das Abonnieren bitte aktivieren, wenn die Daten in beide Richtungen schreibbar s
 
 ## 1.4 Beispiel
 Ein Topic sieht also Bspw. so aus: iobroker/Talstrasse1a/Leistung/Gesamt
+
+
+# 2 Definitions Skript
+### 2.1 Grundlegende Definitionen eintragen
+Im Definitions Skript, können Grundlegende Infomationen zum System eingetragen werden.
+Hier ein Bsp.
+<br/>
+<br/>
+<img width="885" height="610" alt="image" src="https://github.com/user-attachments/assets/ae8d28cf-fc7b-442b-a596-24c0b07682aa" />
+
+Weitergehen, können Entitäten, mit bestimmten Strukturen definiert werden.
+Aktuell werden Entitäten mit folgenden Typen unterstützt:
+* climate
+
+<img width="517" height="405" alt="image" src="https://github.com/user-attachments/assets/b3194721-b2c9-4bbc-bda4-765cda6663d1" />
+
+
