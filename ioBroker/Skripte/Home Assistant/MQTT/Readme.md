@@ -16,3 +16,5 @@ Nun kann man die entsprechenden Einstellungen vornehmen:
 Das Topic sollte folgendermaßen aufgebaut sein:
 ### 1.1.1 Prefix
 Beginnen sollte das Topic mit "iobroker/" (Dies ist im Skript konfigurierbar)
+### 1.1.2 Gerät
+Der Zweite Eintrag ist der Name des Geräts, welches erzeugt werden soll. (Bspw. hier "Talstrasse1a/")
