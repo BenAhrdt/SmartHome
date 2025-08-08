@@ -11,8 +11,8 @@ Um Daten übertragen zu können, geht man im ioBroker auf den States zu dem Zahn
 ## 1. Eintragen der Daten in den MQTT-Client
 Nun kann man die entsprechenden Einstellungen vornehmen:
 <img width="1266" height="496" alt="image" src="https://github.com/user-attachments/assets/b786133e-c0cb-46ce-a34d-24d6afb38e22" />
-
-
+<br/>
+<br/>
 ## 1.1 Topic
 Das Topic sollte folgendermaßen aufgebaut sein:
 ### 1.1.1 Prefix
@@ -24,8 +24,8 @@ Nachfolgend können beliebig viele Verschachtungen (man sollte es nicht übertre
 um seine Entität strukturiert aufzubauen. (hier "Leistung/")
 ### 1.1.4 Entitätsname
 Als letzten Eintrag im Topic wir der Name der Entität erwarten, welche erzeugt werden soll. (Hier nicht zu sehen "Gesamt")
-
-
+<br/>
+<br/>
 ## 1.2 Publish
 ### 1.2.1 Aktiviert
 Die Publish Option aktiviert man, wenn Daten von ioBroker zu Home Assistant gesendet werden sollen. (Dies ist in der Regel immer der Fall).
