@@ -96,4 +96,4 @@ Der Fortschritt gibt an, wie weit das Skript in der Abarbeitung fortgeschritten 
 
 # Changelog
 ## 0.0.20
-Ein erzeugter standardstate wird nun 1s nach dem Anlegen mit ACK = true geschrieben.
+Ein erzeugter Standardstate wird nun 1s nach dem Anlegen mit ACK = true geschrieben.
