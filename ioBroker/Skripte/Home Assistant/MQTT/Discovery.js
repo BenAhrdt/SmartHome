@@ -1,5 +1,5 @@
 
-// V 0.0.17
+// V 0.0.18
 
 /*
     In diesem Script, werden alle States, wessen Topic mit "iobroker/" (konfigurierbar) beginnt für Home Assistant sozusagen auto discovert.
@@ -21,13 +21,15 @@ await createStateAsync(Definitions.IdEntityGeneration,'',{"name": "Discovery","r
 await setDeviceDefinitions();
 
 async function setDeviceDefinitions(){
-    for(const DeviceDefinition of Definitions.DeviceDefinitions){
-        switch(DeviceDefinition.Type){
-            case 'climate':
-                await setCLimate(DeviceDefinition);
-            break;
+    if(Definitions.DeviceDefinitions){
+        for(const DeviceDefinition of Definitions.DeviceDefinitions){
+            switch(DeviceDefinition.Type){
+                case 'climate':
+                    await setCLimate(DeviceDefinition);
+                break;
+            }
+            await sleep(100);
         }
-        await sleep(100);
     }
 }
 
