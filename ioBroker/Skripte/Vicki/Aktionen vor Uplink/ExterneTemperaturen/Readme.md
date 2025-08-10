@@ -5,9 +5,7 @@ kann dieses Skirpt verwendet werden.
 <br/>
 Es müssen folgende Konfigurationen durchgeführt werden.
 ## 1. Erstellen der Unterkategorien in der Enum "Regelgruppen"
-
-<img width="751" height="876" alt="image" src="https://github.com/user-attachments/assets/0126d5e3-1a85-4c62-97fe-54cb62b66bc1" />
-
+<img width="751" height="729" alt="image" src="https://github.com/user-attachments/assets/f1fee164-8218-4785-a46c-60f03bf1f94e" />
 ### 1.1 Kategrieerklärung
 #### 1.1.1 Temperatur.Istwert
 Diese Kategorie dient dazu, den tatsächlichen Istwert des Raumnes zu bestimmen.
