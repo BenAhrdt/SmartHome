@@ -94,4 +94,6 @@ Mit den Startbutton, kann ein Synchronieren der in ioBroker konfigurieren States
 Der Fortschritt gibt an, wie weit das Skript in der Abarbeitung fortgeschritten ist.
 
 
-
+# Changelog
+## 0.0020
+Ein erzeugter standardstate wird nun 1s nach dem Anlegen mit ACK = true geschrieben.
