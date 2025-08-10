@@ -24,7 +24,7 @@ Diese Kategorie dient dazu, den tatsächlichen Istwert des Raumnes zu bestimmen.
 Diese Kategorie gibt an, wohin dier Istwert zugewiesen werden soll. (Ziel Bspw. der ExternalTemperatur state vom Vicki).
 
 #### 1.1.3 Temperatur.Mode2
-Diese Kategorie dient dazu, dass bei einem längeren nicht Empfangen der Isttemperatur, durch den externen Sensor, das Vicki auf den Mode 1 zurückgesetzt wird. (Der Mode 2 wird also deaktiviert.
+Diese Kategorie dient dazu, dass bei einem längeren nicht Empfangen der Isttemperatur, durch den externen Sensor, das Vicki auf den Mode 1 zurückgesetzt wird. (Der Mode 2 wird also deaktiviert).
 
 #### 1.1.4 Temperatur.Trigger
 In diese Kategorie legen Sie bitte einen Wert, der mit jedem uplink des Vicki einen neuen Wert annimmt.
