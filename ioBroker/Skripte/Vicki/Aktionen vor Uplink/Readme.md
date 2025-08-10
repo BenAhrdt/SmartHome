@@ -23,3 +23,22 @@ In diese Kategorie legen Sie bitte einen Wert, der mit jedem uplink des Vicki ei
 Dies ist notwendig, da aus zwei aufeinanderfolgenden Werten das Sendeintervall der Vickis errechnet wird.
 <br/>
 Hier wurde der State Time genommen, welcher sich im remaining Ordner des LoraWAN Adapters befindet.
+<br/>
+## 2. Skripterklärung
+### 2.1 Message versand aus dem Trigger Skript
+Aus dem Triggerskript, wird eine Message mit dem zuständigen Raum gesendet.
+<br/>
+Das aktuelle Format der Daten in der Message siet aktuell so aus:
+<br/>
+<img width="496" height="36" alt="image" src="https://github.com/user-attachments/assets/defca01f-c6c7-49ea-95f6-680e72aa3b5d" />
+<br/>
+Die Message lautet: "ThermostatActionBeforeUplink" und sieht wie folgt aus:
+<br/>
+<img width="737" height="45" alt="image" src="https://github.com/user-attachments/assets/6945c592-99d1-4a0b-8534-0d4c7216e405" />
+<br/>
+<br/>
+In den auf die Message zu reagierenden Skripten, kann wie folgt auf diese Message reagiert werden:
+<br/>
+<img width="786" height="154" alt="image" src="https://github.com/user-attachments/assets/c8640b4e-73d2-4ab2-9e53-0007a3ad070a" />
+
+
