@@ -1,19 +1,11 @@
 # Zuweisen einer externen Temeratur zu einem Mclimate Vicki
-Bei einem Mclimate Vicki ist es möglich eine über einen externen Sensor gemessene Temperatur zuzuweisen und diese antatt der von Vicki selbst gemessenen Temperatur zu nutzen.
+Um die Isttemperatur eines externen Sensors noch vor dem nächsten Uplink auszulesen und dem Controlstate "ExternalTemperature" zuzuweisen,
 <br/>
-Dies kann hilfreich, oder auch notwendig sein, wenn das Heizungsthermostat bspw. eingeengt nd / oder in der Abluft des Heizkörpers sitzt und somit die Temperaturmessung verfälscht wird.
+kann dieses Skirpt verwendet werden.
 <br/>
-<br/>
-## 1. Erstellen einer eigenen Enum (Kategorie)
-Um eine Zuweisung der entsprechenden Werte zu machen, wird im Skript nach verschiedenen Enums und dem Raum geschaut, wo sich das Thermostat befindet.
-<br/>
-Es wurde zuerst eine eigene Enum "Regelgruppen" angelegt.
-<img width="579" height="346" alt="image" src="https://github.com/user-attachments/assets/ac8f8313-8954-4b2b-82c3-41865b4a7990" />
-<br/>
-<br/>
-Nun werden einzelne Unterkategorien angelegt.
-<br/>
-<br/>
+Es müssen folgende Konfigurationen durchgeführt werden.
+## 1. Erstellen der Unterkategorien in der Enum "Regelgruppen"
+
 <img width="751" height="876" alt="image" src="https://github.com/user-attachments/assets/0126d5e3-1a85-4c62-97fe-54cb62b66bc1" />
 
 ### 1.1 Kategrieerklärung
