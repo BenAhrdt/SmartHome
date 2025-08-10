@@ -95,5 +95,8 @@ Der Fortschritt gibt an, wie weit das Skript in der Abarbeitung fortgeschritten 
 
 
 # Changelog
+## 0.0.21
+Korrektur von Einheiten (Bei m^3 => m³)
+
 ## 0.0.20
 Ein erzeugter Standardstate wird nun 1s nach dem Anlegen mit ACK = true geschrieben.
