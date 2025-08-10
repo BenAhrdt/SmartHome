@@ -1,5 +1,5 @@
 
-// V 0.0.20
+// V 0.0.21
 
 /*
     In diesem Script, werden alle States, wessen Topic mit "iobroker/" (konfigurierbar) beginnt für Home Assistant sozusagen auto discovert.
@@ -286,6 +286,11 @@ function getHaAttributesForType(common, entityType) {
             attributes.unit_of_measurement = unit || 'Wh';
         } else {
             attributes.unit_of_measurement = unit || '';
+        }
+
+        // Korrektur der Unit
+        if(attributes.unit_of_measurement === "m^3"){
+            attributes.unit_of_measurement = "m³";
         }
 
         // Min und Max zuweisen
