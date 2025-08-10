@@ -76,8 +76,8 @@ Der letzte Punkt AllowCreationEntityWithUsedTopics gibt an, ob die Topics, welch
 auch noch separat ezeugt werden sollen. (Hier im Beispiel die Solltemperatuzr, die Isttemperatur und der Mode.
 
 # 3 Ausführen der Skripte
-## 3.1 Ertstes Ausführen
-Zuerste muss der Definitions Skript ausgeführt werden.
+## 3.1 Erstes Ausführen
+Zuerst muss das Definitions Skript ausgeführt werden.
 <br/>
 Dies erzeugt die notwendigen definierten States.
 <br/>
