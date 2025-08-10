@@ -15,7 +15,7 @@ Es wurde zuerst eine eigene Enum "Regelgruppen" angelegt.
 Nun werden einzelne Unterkategorien angelegt.
 <br/>
 <br/>
-<img width="751" height="876" alt="image" src="https://github.com/user-attachments/assets/0126d5e3-1a85-4c62-97fe-54cb62b66bc1" />
+<img width="751" height="425" alt="image" src="https://github.com/user-attachments/assets/fadd03b6-687e-4491-ba5b-d224a0381c36" />
 
 ### 1.1 Kategrieerklärung
 #### 1.1.1 Temperatur.Istwert
