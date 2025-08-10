@@ -1,10 +1,10 @@
 
-// V 0.0.16
+// V 0.0.17
 
 /*
     In diesem Script, werden alle States, wessen Topic mit "iobroker/" (konfigurierbar) beginnt für Home Assistant sozusagen auto discovert.
-    Es muss lediglich im jeweiligen State das Topic eingetragen und ausgewähl werden, ob nur gepublished oder auch subscribed werden soll.
-    Das Topic ist folgendemaße aufzubauen:
+    Es muss lediglich im jeweiligen State das Topic eingetragen und ausgewählt werden, ob nur gepublished oder auch subscribed werden soll.
+    Das Topic ist folgendemaßen aufzubauen:
     iobroker/Gerätenamen/Frei/Zur/Verfügung/Entitätsname
     Dabei sollte darauf geachtet werden, das keien Umlaute und kein ß verwendet wird.
 */
@@ -12,7 +12,7 @@
 const Definitions = (await messageToAsync('getDevinitions')).result;
 
 
-// Wenn der Sate noch nicht besteht, dann wird er erzeugt:
+// Wenn der State noch nicht besteht, dann wird er erzeugt:
 await createStateAsync(Definitions.IdEntityGeneration,'',{"name": "Discovery","role": "state", "type": "json","read": true,"write": true,"custom": {[Definitions.Clientinstanz]: {"enabled": true,"publish": true,"pubChangesOnly": false,"pubAsObject": false,"qos": false,"retain": true,"subscribe": false,"subChangesOnly": false,"subAsObject": false,"subQos": false,"setAck": false,"topic": ""}}});
 
 // Dieses Array von Topics wird eventuell von den speziellen Geräten gefüllt,
@@ -283,8 +283,9 @@ function getHaAttributesForType(common, entityType) {
             attributes.max = common.max;
         }
 
+        // Es muss eine Device Class zugewiesen sein und der State darf kein String sein.
         // String ist kein Measurement
-        if(!attributes.state_class && type !== 'string'){
+        if(attributes.device_class && !attributes.state_class && type !== 'string'){
             attributes.state_class = 'measurement';
         }
     }
