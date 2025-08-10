@@ -27,7 +27,7 @@ Das Topic sollte folgendermaßen aufgebaut sein:
 Beginnen sollte das Topic mit "iobroker/" (Dies ist im Skript konfigurierbar)
 ### 1.1.2 Gerät
 Der Zweite Eintrag ist der Name des Geräts, welches erzeugt werden soll. (Bspw. hier "Talstrasse1a/")
-### 1.1.3 Softiges
+### 1.1.3 Sonstiges
 Nachfolgend können beliebig viele Verschachtungen (man sollte es nicht übertreiben) genutzt werden,
 um seine Entität strukturiert aufzubauen. (hier "Leistung/")
 ### 1.1.4 Entitätsname
