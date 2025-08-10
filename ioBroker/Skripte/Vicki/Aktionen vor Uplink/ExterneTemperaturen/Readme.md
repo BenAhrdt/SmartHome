@@ -16,14 +16,3 @@ Diese Kategorie gibt an, wohin dier Istwert zugewiesen werden soll. (Ziel Bspw. 
 
 #### 1.1.3 Temperatur.Mode2
 Diese Kategorie dient dazu, dass bei einem längeren nicht Empfangen der Isttemperatur, durch den externen Sensor, das Vicki auf den Mode 1 zurückgesetzt wird. (Der Mode 2 wird also deaktiviert).
-
-#### 1.1.4 Temperatur.Trigger
-In diese Kategorie legen Sie bitte einen Wert, der mit jedem uplink des Vicki einen neuen Wert annimmt.
-<br/>
-Dies ist notwendig, da aus zwei aufeinanderfolgenden Werten das Sendeintervall der Vickis errechnet wird.
-<br/>
-Hier wurde der State Time genommen, welcher sich im remaining Ordner des LoraWAN Adapters befindet.
-<br/>
-Es wird also die aktuelle Temperatur nicht so oft an das Vicki übergeben, wie sich edr State der Isttemperatru verändert, sondern nur mit einer gewissen Vorlaufzeit vor dem nächsten Uplink.
-<br/>
-Diese ist also ausschlaggeben für die Einlesung der Isttemperatur und nicht der sich ändernde Wert selbst.
