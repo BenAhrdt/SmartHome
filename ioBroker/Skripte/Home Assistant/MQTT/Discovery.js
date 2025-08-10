@@ -1,5 +1,5 @@
 
-// V 0.0.18
+// V 0.0.19
 
 /*
     In diesem Script, werden alle States, wessen Topic mit "iobroker/" (konfigurierbar) beginnt für Home Assistant sozusagen auto discovert.
@@ -244,6 +244,7 @@ function getEntityType(common) {
 function getHaAttributesForType(common, entityType) {
     const role = (common?.role || '').toLowerCase();
     const unit = common?.unit || '';
+    const unitLower = unit.toLowerCase();
     const type = common?.type || '';
     const attributes = {};
 
@@ -263,6 +264,15 @@ function getHaAttributesForType(common, entityType) {
         } else if (role.includes('power') && !unit.includes('Wh')) { // Sonoff mit value.power.consumtion und kWh ausnehmen
             attributes.device_class = 'power';
             attributes.unit_of_measurement = unit || 'W';
+        } else if (unitLower === "w" || unitLower === "kw") {
+            attributes.device_class = 'power';
+            attributes.unit_of_measurement = unit;
+        } else if (unitLower === "v") {
+            attributes.device_class = 'voltage';
+            attributes.unit_of_measurement = unit;
+        } else if (unitLower === "a") {
+            attributes.device_class = 'current';
+            attributes.unit_of_measurement = unit;
         } else if (role.includes('energy') || (role.includes('power.consumption') && unit.includes('Wh'))) { // Sonoff speziefisch, wegen falscher Rolle
             attributes.device_class = 'energy';
          /*   if(role.includes('consumed') || role.includes('produced')){
@@ -287,7 +297,7 @@ function getHaAttributesForType(common, entityType) {
 
         // Es muss eine Device Class zugewiesen sein und der State darf kein String sein.
         // String ist kein Measurement
-        if(attributes.device_class && !attributes.state_class && type !== 'string'){
+        if(!attributes.state_class && type !== 'string'){
             attributes.state_class = 'measurement';
         }
     }
