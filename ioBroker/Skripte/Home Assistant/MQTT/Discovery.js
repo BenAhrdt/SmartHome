@@ -1,5 +1,5 @@
 
-// V 0.0.19
+// V 0.0.20
 
 /*
     In diesem Script, werden alle States, wessen Topic mit "iobroker/" (konfigurierbar) beginnt für Home Assistant sozusagen auto discovert.
@@ -198,6 +198,7 @@ async function runToObjects(){
                     State.state_topic,
                     'warn');
             }
+            setStateDelayed(obj._id,getState(obj._id).val,true,1000);
             await sleep(100);
             //await sleep(100);
         }
