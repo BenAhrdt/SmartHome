@@ -95,6 +95,9 @@ Der Fortschritt gibt an, wie weit das Skript in der Abarbeitung fortgeschritten 
 
 
 # Changelog
+## 0.0.22
+Device_class "Weight" hinzugefügt, um einen State vom Typ Gewicht korrekt zu übergeben
+
 ## 0.0.21
 Korrektur von Einheiten (Bei m^3 => m³)
 
