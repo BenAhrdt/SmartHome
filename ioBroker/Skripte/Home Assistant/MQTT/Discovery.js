@@ -1,5 +1,5 @@
 
-// V 0.0.21
+// V 0.0.22
 
 /*
     In diesem Script, werden alle States, wessen Topic mit "iobroker/" (konfigurierbar) beginnt für Home Assistant sozusagen auto discovert.
@@ -284,6 +284,12 @@ function getHaAttributesForType(common, entityType) {
                 attributes.state_class = 'total_increasing';
             //}
             attributes.unit_of_measurement = unit || 'Wh';
+        } else if (role.includes('weight')) { // Sonoff mit value.power.consumtion und kWh ausnehmen
+            attributes.device_class = 'weight';
+            attributes.unit_of_measurement = unit || 'kg';
+        } else if (unitLower === "g" || unitLower === "kg") {
+            attributes.device_class = 'weight';
+            attributes.unit_of_measurement = unit;
         } else {
             attributes.unit_of_measurement = unit || '';
         }
