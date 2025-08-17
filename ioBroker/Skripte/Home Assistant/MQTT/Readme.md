@@ -95,6 +95,9 @@ Der Fortschritt gibt an, wie weit das Skript in der Abarbeitung fortgeschritten 
 
 
 # Changelog
+## 0.0.23
+Replace Chars in Friedly Name of device "_" to " "
+
 ## 0.0.22
 Device_class "Weight" hinzugefügt, um einen State vom Typ Gewicht korrekt zu übergeben
 
