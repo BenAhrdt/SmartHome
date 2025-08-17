@@ -1,6 +1,4 @@
-
-
-// V 0.0.5
+// V 0.0.6
 
 
 /*
@@ -26,7 +24,8 @@ Definitions.Topicstart = 'iobroker/'
 
 // Hier können Anfänge von Ids, oder auch ganze State Ids eingetragen weden, welche nicht verwendet werden dürfen.
 Definitions.DisallowedStart = [ 'system',
-                                '0_userdata.0.Produktiv.Home_Assistant'];
+                                '0_userdata.0.Produktiv.Home_Assistant.Daten',
+                                '0_userdata.0.Produktiv.Home_Assistant.MQTT_Config'];
 Definitions.StartId = '';
 Definitions.SelectorOfObjects = $(`state[id=${Definitions.StartId}*]`).toArray();
 
@@ -46,16 +45,14 @@ Definitions.IdEnableDiscoveryscript = 'javascript.0.scriptEnabled.common.HomeAss
  *      Definition der Climate Entitäten
 ************************************************/
 
-// Definition der Topicnamen für Climat Entitäten
-Definitions.ClimateMode = 'TemperaturMode';
-Definitions.ClimateSollwert = 'Temperatursollwert';
-Definitions.ClimateIstwert = 'Temperaturistwert';
-
 // Definition der speziellen Geräte (Bspw. CLimate)
 Definitions.DeviceDefinitions = [];
 Definitions.DeviceDefinitions.push({Type:'climate',
                         Devicename: 'Pool',
                         Entityname: 'Waermepumpe',
+                        Mode: 'TemperaturMode',
+                        Set: "Temperatursollwert",
+                        Act: "Temperaturistwert",
                         MinTemp: 26,
                         MaxTemp: 30,
                         Precision: 1,
@@ -65,8 +62,11 @@ Definitions.DeviceDefinitions.push({Type:'climate',
                     );
 
 Definitions.DeviceDefinitions.push({Type:'climate',
-                        Devicename: 'Wellness',
+                        Devicename: 'Heizen ThermostatWellness',
                         Entityname: 'Thermostat',
+                        Mode: 'TemperaturMode',
+                        Set: "TargetTemperature",
+                        Act: "SensorTemperature",
                         MinTemp: 6,
                         MaxTemp: 30,
                         Precision: 0.5,
@@ -76,8 +76,25 @@ Definitions.DeviceDefinitions.push({Type:'climate',
                     );
 
 Definitions.DeviceDefinitions.push({Type:'climate',
-                        Devicename: 'RikasVicki',
+                        Devicename: 'Heizen ThermostatKinderzimmerRika',
                         Entityname: 'Thermostat',
+                        Mode: 'TemperaturMode',
+                        Set: "TargetTemperature",
+                        Act: "extSensorTemperature",
+                        MinTemp: 6,
+                        MaxTemp: 30,
+                        Precision: 0.5,
+                        Modes: ['auto', 'heat', 'off'],
+                        AllowCreationOfEntityWithUsedTopics: true
+                        }
+                    );
+
+Definitions.DeviceDefinitions.push({Type:'climate',
+                        Devicename: 'Heizen ThermostatSpielzimmerRika',
+                        Entityname: 'Thermostat',
+                        Mode: 'TemperaturMode',
+                        Set: "TargetTemperature",
+                        Act: "SensorTemperature",
                         MinTemp: 6,
                         MaxTemp: 30,
                         Precision: 0.5,
