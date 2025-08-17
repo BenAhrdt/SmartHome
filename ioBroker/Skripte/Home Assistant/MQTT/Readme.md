@@ -95,11 +95,17 @@ Der Fortschritt gibt an, wie weit das Skript in der Abarbeitung fortgeschritten 
 
 
 # Changelog
-## 0.0.23
-Space is allowed in Topic. Unique will be set to "_" and Friendly Name will be " "
+## 0.0.25
+Set Mode, Set und Act Name zu  Climate Entitäten hinzugefügt
+
+## 0.0.24
+Climate Topics hinzugefügt
 
 ## 0.0.23
-Replace Chars in Friedly Name of device "_" to " "
+Leerzeichen ist in der Topic erlaubt. Unique wird zu "-" gesetzt. Im Namen bleibt das Leerzeichen erhalten.
+
+## 0.0.23
+Zeichen vom Typ "_" im Namen gegen " " ausgetauscht
 
 ## 0.0.22
 Device_class "Weight" hinzugefügt, um einen State vom Typ Gewicht korrekt zu übergeben
