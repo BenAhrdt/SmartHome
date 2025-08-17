@@ -1,5 +1,4 @@
-
-// V 0.0.24
+// V 0.0.25
 
 /*
     In diesem Script, werden alle States, wessen Topic mit "iobroker/" (konfigurierbar) beginnt für Home Assistant sozusagen auto discovert.
@@ -8,7 +7,8 @@
     iobroker/Gerätenamen/Frei/Zur/Verfügung/Entitätsname
     Dabei sollte darauf geachtet werden, das keien Umlaute und kein ß verwendet wird.
 */
-
+const Devicelogging = true;
+const Statelogging = false;
 const Definitions = (await messageToAsync('getDevinitions')).result;
 
 
@@ -37,7 +37,7 @@ async function setDeviceDefinitions(){
 async function setCLimate(DeviceDefinition){
   
     // Topic erstellen (Namen bereinigen)
-    DeviceDefinition.Devicename = sanitizeForId(DeviceDefinition.Devicename);
+    DeviceDefinition.Devicename = sanitizeForId(DeviceDefinition.Devicename,true,true);
     DeviceDefinition.Entityname = sanitizeForId(DeviceDefinition.Entityname);
     const UniquName = DeviceDefinition.Entityname? sanitizeForId(DeviceDefinition.Devicename.toLowerCase()) + '_' + sanitizeForId(DeviceDefinition.Entityname.toLowerCase()): sanitizeForId(DeviceDefinition.Devicename.toLowerCase());
     const Topic = `homeassistant/climate/${UniquName}/config`;
@@ -52,11 +52,11 @@ async function setCLimate(DeviceDefinition){
             ],
             "name": DeviceDefinition.Devicename
         },
-        "mode_state_topic": `${Definitions.Topicstart}${DeviceDefinition.Devicename}/${Definitions.ClimateMode}`,
-        "mode_command_topic": `${Definitions.Topicstart}${DeviceDefinition.Devicename}/${Definitions.ClimateMode}`,
-        "temperature_state_topic": `${Definitions.Topicstart}${DeviceDefinition.Devicename}/${Definitions.ClimateSollwert}`,
-        "temperature_command_topic": `${Definitions.Topicstart}${DeviceDefinition.Devicename}/${Definitions.ClimateSollwert}`,
-        "current_temperature_topic": `${Definitions.Topicstart}${DeviceDefinition.Devicename}/${Definitions.ClimateIstwert}`,
+        "mode_state_topic": `${Definitions.Topicstart}${DeviceDefinition.Devicename}/${DeviceDefinition.Mode}`,
+        "mode_command_topic": `${Definitions.Topicstart}${DeviceDefinition.Devicename}/${DeviceDefinition.Mode}`,
+        "temperature_state_topic": `${Definitions.Topicstart}${DeviceDefinition.Devicename}/${DeviceDefinition.Set}`,
+        "temperature_command_topic": `${Definitions.Topicstart}${DeviceDefinition.Devicename}/${DeviceDefinition.Set}`,
+        "current_temperature_topic": `${Definitions.Topicstart}${DeviceDefinition.Devicename}/${DeviceDefinition.Act}`,
         "min_temp": DeviceDefinition.MinTemp,
         "max_temp": DeviceDefinition.MaxTemp,
         "modes": DeviceDefinition.Modes,
@@ -80,12 +80,14 @@ async function setCLimate(DeviceDefinition){
         Definitions.NotAllowedTopics.push(DiscoveryJSON.temperature_state_topic);
         Definitions.NotAllowedTopics.push(DiscoveryJSON.current_temperature_topic);
     }
-    log('Erzeugung einer Climate Entität:' +
-        '\nTopic: ' + ObjectOfGeneration.common.custom[Definitions.Clientinstanz].topic +
-        '\nPayload: ' + JSON.stringify(DiscoveryJSON) +
-        '\nModeTopic: ' + DiscoveryJSON.mode_state_topic +
-        '\nSolltemperaturTopic: ' + DiscoveryJSON.temperature_state_topic +
-        '\nIsttemperaturTopic: ' + DiscoveryJSON.current_temperature_topic);
+    if(Devicelogging){
+        log('Erzeugung einer Climate Entität:' +
+            '\nTopic: ' + ObjectOfGeneration.common.custom[Definitions.Clientinstanz].topic +
+            '\nPayload: ' + JSON.stringify(DiscoveryJSON) +
+            '\nModeTopic: ' + DiscoveryJSON.mode_state_topic +
+            '\nSolltemperaturTopic: ' + DiscoveryJSON.temperature_state_topic +
+            '\nIsttemperaturTopic: ' + DiscoveryJSON.current_temperature_topic);
+    }
 }
 
 
@@ -188,15 +190,19 @@ async function runToObjects(){
             // Discovery JSON Schreiben und topic setzen
             await setStateAsync(Definitions.IdEntityGeneration,JSON.stringify(State),true);
             await setObjectAsync(Definitions.IdEntityGeneration,ObjectOfGeneration);
-            log('Erzeugung:' +
-                '\nTopic: ' + ObjectOfGeneration.common.custom[Definitions.Clientinstanz].topic +
-                '\nPayload: ' + JSON.stringify(State) +
-                '\nStateTopic: ' + obj.common.custom[Definitions.Clientinstanz].topic +
-                '\nId: ' + obj._id);
+            if(Statelogging){
+                log('Erzeugung:' +
+                    '\nTopic: ' + ObjectOfGeneration.common.custom[Definitions.Clientinstanz].topic +
+                    '\nPayload: ' + JSON.stringify(State) +
+                    '\nStateTopic: ' + obj.common.custom[Definitions.Clientinstanz].topic +
+                    '\nId: ' + obj._id);
+            }
             if(obj.common.custom[Definitions.Clientinstanz].topic !== sanitizeForId(obj.common.custom[Definitions.Clientinstanz].topic,false,true)){
-                log('Die originaltopic entspricht nicht den zuelassenen Zeichen und wurde so an HomeAssistant gesendet:\n' +
-                    State.state_topic,
-                    'warn');
+                if(Statelogging){
+                    log('Die originaltopic entspricht nicht den zuelassenen Zeichen und wurde so an HomeAssistant gesendet:\n' +
+                        State.state_topic,
+                        'warn');
+                }
             }
             setStateDelayed(obj._id,getState(obj._id).val,true,1000);
             await sleep(100);
