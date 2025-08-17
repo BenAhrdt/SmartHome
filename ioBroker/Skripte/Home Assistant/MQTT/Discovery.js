@@ -1,4 +1,4 @@
-// V 0.0.25
+// V 0.0.26
 
 /*
     In diesem Script, werden alle States, wessen Topic mit "iobroker/" (konfigurierbar) beginnt für Home Assistant sozusagen auto discovert.
@@ -7,8 +7,8 @@
     iobroker/Gerätenamen/Frei/Zur/Verfügung/Entitätsname
     Dabei sollte darauf geachtet werden, das keien Umlaute und kein ß verwendet wird.
 */
-const Devicelogging = true;
-const Statelogging = false;
+const Devicelogging = '';   // false => kein logging ; '' => logged alles ; 'abc' => logged alles mit abc im Namen
+const Statelogging = false; // false => kein logging ; '' => logged alles ; 'abc' => logged alles mit abc im Topic
 const Definitions = (await messageToAsync('getDevinitions')).result;
 
 
@@ -80,7 +80,7 @@ async function setCLimate(DeviceDefinition){
         Definitions.NotAllowedTopics.push(DiscoveryJSON.temperature_state_topic);
         Definitions.NotAllowedTopics.push(DiscoveryJSON.current_temperature_topic);
     }
-    if(Devicelogging){
+    if(typeof Devicelogging === 'string' && (Devicelogging === '' || DeviceDefinition.Entityname.indexOf(Devicelogging) !== -1)){
         log('Erzeugung einer Climate Entität:' +
             '\nTopic: ' + ObjectOfGeneration.common.custom[Definitions.Clientinstanz].topic +
             '\nPayload: ' + JSON.stringify(DiscoveryJSON) +
@@ -190,7 +190,7 @@ async function runToObjects(){
             // Discovery JSON Schreiben und topic setzen
             await setStateAsync(Definitions.IdEntityGeneration,JSON.stringify(State),true);
             await setObjectAsync(Definitions.IdEntityGeneration,ObjectOfGeneration);
-            if(Statelogging){
+            if(typeof Statelogging === 'string' && (Statelogging === '' || obj.common.custom[Definitions.Clientinstanz].topic.indexOf(Statelogging) !== -1)){
                 log('Erzeugung:' +
                     '\nTopic: ' + ObjectOfGeneration.common.custom[Definitions.Clientinstanz].topic +
                     '\nPayload: ' + JSON.stringify(State) +
@@ -198,7 +198,7 @@ async function runToObjects(){
                     '\nId: ' + obj._id);
             }
             if(obj.common.custom[Definitions.Clientinstanz].topic !== sanitizeForId(obj.common.custom[Definitions.Clientinstanz].topic,false,true)){
-                if(Statelogging){
+            if(typeof Statelogging === 'string' && (Statelogging === '' || obj.common.custom[Definitions.Clientinstanz].topic.indexOf(Statelogging) !== -1)){
                     log('Die originaltopic entspricht nicht den zuelassenen Zeichen und wurde so an HomeAssistant gesendet:\n' +
                         State.state_topic,
                         'warn');
