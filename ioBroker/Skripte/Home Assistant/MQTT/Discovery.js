@@ -1,5 +1,5 @@
 
-// V 0.0.22
+// V 0.0.23
 
 /*
     In diesem Script, werden alle States, wessen Topic mit "iobroker/" (konfigurierbar) beginnt für Home Assistant sozusagen auto discovert.
@@ -50,7 +50,7 @@ async function setCLimate(DeviceDefinition){
             "identifiers": [
             sanitizeForId(DeviceDefinition.Devicename.toLowerCase())
             ],
-            "name": DeviceDefinition.Devicename
+            "name": changeFriendlyName(DeviceDefinition.Devicename)
         },
         "mode_state_topic": `${Definitions.Topicstart}${DeviceDefinition.Devicename}/${Definitions.ClimateMode}`,
         "mode_command_topic": `${Definitions.Topicstart}${DeviceDefinition.Devicename}/${Definitions.ClimateMode}`,
@@ -130,7 +130,7 @@ async function runToObjects(){
             ProgressOld = Progress;
             setState(Definitions.IdProgress,Math.round(Progress),true);
         }
-
+        
         let topic = obj.common.custom[Definitions.Clientinstanz].topic;
         if(topic.indexOf(Definitions.Topicstart) === 0){
             topic = topic.substring(9,topic.length);
@@ -144,7 +144,7 @@ async function runToObjects(){
             const EntityName = topic.substring(topic.lastIndexOf('/') + 1, topic.length);
             // Generierungsobjekt lesen
             const ObjectOfGeneration = await getObjectAsync(Definitions.IdEntityGeneration);
-            
+
             let Topic = 'homeassistant/';
             const EntityType = getEntityType(obj.common);
             Topic += EntityType + '/';
@@ -167,7 +167,7 @@ async function runToObjects(){
             /*   "step": 0.5,*/
                 "device": {
                     "identifiers": [DeviceName.toLowerCase()],
-                    "name": DeviceName
+                    "name": changeFriendlyName(DeviceName)
                 }
             }
 
@@ -357,4 +357,11 @@ function sanitizeForId(str, withoutSlash = false) {
         .replace(/ß/g, 'ss')
         .replace(/ /g, '_')
         .replace(/\//g, withoutSlash ? '_' : '/');
+}
+
+// Friendly Name ändern (Leerzeichen einfügen)
+function changeFriendlyName(str) {
+    return str
+        .replace(/_/g, ' ')
+        .replace(/-/g, ' ');
 }
