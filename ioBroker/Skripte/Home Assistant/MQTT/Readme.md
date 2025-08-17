@@ -96,6 +96,9 @@ Der Fortschritt gibt an, wie weit das Skript in der Abarbeitung fortgeschritten 
 
 # Changelog
 ## 0.0.25
+More options for logging
+
+## 0.0.25
 Set Mode, Set und Act Name zu  Climate Entitäten hinzugefügt
 
 ## 0.0.24
