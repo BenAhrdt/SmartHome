@@ -1,4 +1,4 @@
-// V 0.0.6
+// V 0.0.7
 
 
 /*
@@ -184,6 +184,7 @@ on({id:Definitions.IdProgress, val:100},(dp)=>{
  ******************************************/
 
 onMessage('getDevinitions',async (data,callback)=>{
+    Definitions.SelectorOfObjects = $(`state[id=${Definitions.StartId}*]`).toArray();
     callback({result:Definitions});//, data: getState(idStartfolderKonfigurationTelegramInstanz).val};
 });
 
