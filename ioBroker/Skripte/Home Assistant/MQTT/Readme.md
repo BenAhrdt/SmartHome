@@ -96,6 +96,9 @@ Der Fortschritt gibt an, wie weit das Skript in der Abarbeitung fortgeschritten 
 
 # Changelog
 ## 0.0.23
+Space is allowed in Topic. Unique will be set to "_" and Friendly Name will be " "
+
+## 0.0.23
 Replace Chars in Friedly Name of device "_" to " "
 
 ## 0.0.22
