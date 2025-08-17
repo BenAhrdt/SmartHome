@@ -1,5 +1,5 @@
 
-// V 0.0.23
+// V 0.0.24
 
 /*
     In diesem Script, werden alle States, wessen Topic mit "iobroker/" (konfigurierbar) beginnt für Home Assistant sozusagen auto discovert.
@@ -50,7 +50,7 @@ async function setCLimate(DeviceDefinition){
             "identifiers": [
             sanitizeForId(DeviceDefinition.Devicename.toLowerCase())
             ],
-            "name": changeFriendlyName(DeviceDefinition.Devicename)
+            "name": DeviceDefinition.Devicename
         },
         "mode_state_topic": `${Definitions.Topicstart}${DeviceDefinition.Devicename}/${Definitions.ClimateMode}`,
         "mode_command_topic": `${Definitions.Topicstart}${DeviceDefinition.Devicename}/${Definitions.ClimateMode}`,
@@ -130,17 +130,17 @@ async function runToObjects(){
             ProgressOld = Progress;
             setState(Definitions.IdProgress,Math.round(Progress),true);
         }
-        
+
         let topic = obj.common.custom[Definitions.Clientinstanz].topic;
         if(topic.indexOf(Definitions.Topicstart) === 0){
-            topic = topic.substring(9,topic.length);
+            topic = topic.substring(Definitions.Topicstart.length,topic.length);
             const uniqe = sanitizeForId(topic.toLowerCase(),true);
-            const Statetopic = sanitizeForId(topic);
+            const Statetopic = sanitizeForId(topic,false,true);
             let DeviceName = 'Dummygerät'
             if(topic.indexOf('/') !== -1){
                 DeviceName = topic.substring(0,topic.indexOf('/'));
             }
-            DeviceName = sanitizeForId(DeviceName);
+            DeviceName = sanitizeForId(DeviceName,true,true);
             const EntityName = topic.substring(topic.lastIndexOf('/') + 1, topic.length);
             // Generierungsobjekt lesen
             const ObjectOfGeneration = await getObjectAsync(Definitions.IdEntityGeneration);
@@ -154,7 +154,7 @@ async function runToObjects(){
             // Zuerst Topic leer schreiben undanschließend auch state leer schreiben
             await setObjectAsync(Definitions.IdEntityGeneration,ObjectOfGeneration);
             //await sleep(100);
-            ObjectOfGeneration.common.custom[Definitions.Clientinstanz].topic = sanitizeForId(Topic);
+            ObjectOfGeneration.common.custom[Definitions.Clientinstanz].topic = sanitizeForId(Topic,false);
 
             // Abfrage, ob es sich um ein nicht erlautes Topic handelt
             if(Definitions.NotAllowedTopics.includes(obj.common.custom[Definitions.Clientinstanz].topic)){
@@ -166,8 +166,8 @@ async function runToObjects(){
                 "unique_id": uniqe,
             /*   "step": 0.5,*/
                 "device": {
-                    "identifiers": [DeviceName.toLowerCase()],
-                    "name": changeFriendlyName(DeviceName)
+                    "identifiers": [sanitizeForId(DeviceName.toLowerCase(),true)],
+                    "name": DeviceName
                 }
             }
 
@@ -193,7 +193,7 @@ async function runToObjects(){
                 '\nPayload: ' + JSON.stringify(State) +
                 '\nStateTopic: ' + obj.common.custom[Definitions.Clientinstanz].topic +
                 '\nId: ' + obj._id);
-            if(obj.common.custom[Definitions.Clientinstanz].topic !== sanitizeForId(obj.common.custom[Definitions.Clientinstanz].topic)){
+            if(obj.common.custom[Definitions.Clientinstanz].topic !== sanitizeForId(obj.common.custom[Definitions.Clientinstanz].topic,false,true)){
                 log('Die originaltopic entspricht nicht den zuelassenen Zeichen und wurde so an HomeAssistant gesendet:\n' +
                     State.state_topic,
                     'warn');
@@ -346,7 +346,7 @@ function getHaAttributesForType(common, entityType) {
 }
 
 // Nicht erlaube Zeichen bereinigen
-function sanitizeForId(str, withoutSlash = false) {
+function sanitizeForId(str, withoutSlash = false, withSpace = false) {
     return str
         .replace(/ä/g, 'ae')
         .replace(/ö/g, 'oe')
@@ -355,13 +355,6 @@ function sanitizeForId(str, withoutSlash = false) {
         .replace(/Ö/g, 'Oe')
         .replace(/Ü/g, 'Ue')
         .replace(/ß/g, 'ss')
-        .replace(/ /g, '_')
+        .replace(/ /g, withSpace ? ' ' : '_')
         .replace(/\//g, withoutSlash ? '_' : '/');
-}
-
-// Friendly Name ändern (Leerzeichen einfügen)
-function changeFriendlyName(str) {
-    return str
-        .replace(/_/g, ' ')
-        .replace(/-/g, ' ');
 }
