@@ -8,9 +8,8 @@
     Dabei sollte darauf geachtet werden, das keien Umlaute und kein ß verwendet wird.
 */
 const Devicelogging = '';   // false => kein logging ; '' => logged alles ; 'abc' => logged alles mit abc im Namen
-const Statelogging = false; // false => kein logging ; '' => logged alles ; 'abc' => logged alles mit abc im Topic
+const Statelogging = 'push'; // false => kein logging ; '' => logged alles ; 'abc' => logged alles mit abc im Topic
 const Definitions = (await messageToAsync('getDevinitions')).result;
-
 
 // Wenn der State noch nicht besteht, dann wird er erzeugt:
 await createStateAsync(Definitions.IdEntityGeneration,'',{"name": "Discovery","role": "state", "type": "json","read": true,"write": true,"custom": {[Definitions.Clientinstanz]: {"enabled": true,"publish": true,"pubChangesOnly": false,"pubAsObject": false,"qos": false,"retain": true,"subscribe": false,"subChangesOnly": false,"subAsObject": false,"subQos": false,"setAck": false,"topic": ""}}});
