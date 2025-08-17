@@ -95,7 +95,10 @@ Der Fortschritt gibt an, wie weit das Skript in der Abarbeitung fortgeschritten 
 
 
 # Changelog
-## 0.0.25
+## 0.0.27
+Logging der erzeugenten Speziellen Geräte und der standard Entitäten.
+
+## 0.0.26
 More options for logging
 
 ## 0.0.25
