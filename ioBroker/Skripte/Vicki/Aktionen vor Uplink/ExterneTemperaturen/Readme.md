@@ -5,7 +5,7 @@ kann dieses Skirpt verwendet werden.
 <br/>
 Es müssen folgende Konfigurationen durchgeführt werden.
 ## 1. Erstellen der Unterkategorien in der Enum "Regelgruppen"
-<img width="751" height="729" alt="image" src="https://github.com/user-attachments/assets/f1fee164-8218-4785-a46c-60f03bf1f94e" />
+<img width="743" height="872" alt="image" src="https://github.com/user-attachments/assets/3523bcdc-26e8-4da1-aece-0dfeb8ce85cd" />
 
 ### 1.1 Kategrieerklärung
 #### 1.1.1 Temperatur.Istwert
