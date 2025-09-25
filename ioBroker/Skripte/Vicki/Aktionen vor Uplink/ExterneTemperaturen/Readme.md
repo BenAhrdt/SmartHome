@@ -8,10 +8,10 @@ Es müssen folgende Konfigurationen durchgeführt werden.
 <img width="743" height="872" alt="image" src="https://github.com/user-attachments/assets/3523bcdc-26e8-4da1-aece-0dfeb8ce85cd" />
 
 ### 1.1 Kategrieerklärung
-#### 1.1.1 Temperatur.Istwert
+#### 1.1.1 Temperatur.Extern.Istwert
 Diese Kategorie dient dazu, den tatsächlichen Istwert des Raumnes zu bestimmen.
 
-#### 1.1.2 Temperatur.Istwert.Extern
+#### 1.1.2 Temperatur.Extern.Sollwert
 Diese Kategorie gibt an, wohin dier Istwert zugewiesen werden soll. (Ziel Bspw. der ExternalTemperatur state vom Vicki).
 
 #### 1.1.3 Temperatur.Mode2
