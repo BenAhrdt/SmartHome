@@ -4,13 +4,15 @@ const EnumIsttemperaturExternIstwert = "Temperature.External.State"; // Istwert 
 const EnumIsttemperaturExternSollwert = "Temperature.External.Set";  // Externser Sollwert (Downlink an Thermostat)
 const EnumTemperaturMode2 = "Temperature.Mode2";
 const MaxDifferenz = 2 * 60 * 60 * 1000; // 2 Stunden
-const extTempStateChanged = {};
+const extTempSensor = {};
 
 const IstTempArray = $(`state(${EnumRegelgruppen}=${EnumIsttemperaturExternIstwert})`).toArray();
 
 on(IstTempArray,(dp)=>{
     const roomId = getRoomId(dp.id);
-    extTempStateChanged[roomId] = true;
+    extTempSensor[roomId] = {
+        tempChange: true
+    }
 });
 
 // Auf einen externen Aufruf reagieren
@@ -28,8 +30,10 @@ function ReadTemperature(Data){
         const Jetzt = Date.now();
         const Isttemperatur = SelectorIsttemperatur.getState();
         if((Jetzt - Isttemperatur.ts) <= MaxDifferenz){
-            if (extTempStateChanged[Data.RoomId]) {
-                delete extTempStateChanged[Data.RoomId];
+            if (!extTempSensor[Data.RoomId] || extTempSensor[Data.RoomId].tempChange) {
+                extTempSensor[Data.RoomId] = {
+                    tempChange: false
+                }
                 SelectorIsttemperaturExternal.setState(Isttemperatur.val);
                 //log(`Zugewiesen: ${Isttemperatur.val}°C`);
             }
