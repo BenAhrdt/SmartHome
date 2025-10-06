@@ -1,1 +1,7 @@
+Um in Chirpstack einen Downlink direkt mit einem Uplink zu senden, muss zum Zeitpunkt des Uplinks etwas im Chirpstack Queue stehen.
+Da wird in NextSend unsere Daten sammeln, ist dies nicht der Fall.
 
+Hierzu dies das PushDownlink Script.
+Das Script schreibt, sobald ein Wert in NextSend geschrieben wird (und NextSend vorher '0' war),
+den festen Eintrag '04' (Get Device Version Number) in den push Datenpunkt und sendet diesen zu Chirpstack.
+Natürlich mit der passenden DevEUI.
