@@ -5,7 +5,8 @@ dass der Downlink auch in diesem Zyklus gesendet wird, muss den NextSend-hex Wer
 <br/>
 Es müssen folgende Konfigurationen durchgeführt werden.
 ## 1. Erstellen der Unterkategorien in der Enum "Regelgruppen"
-<img width="743" height="872" alt="image" src="https://github.com/user-attachments/assets/3523bcdc-26e8-4da1-aece-0dfeb8ce85cd" />
+
+
 
 ### 1.1 Kategrieerklärung
 #### 1.1.1 Temperatur.Extern.Istwert
