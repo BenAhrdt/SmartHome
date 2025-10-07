@@ -2,8 +2,8 @@
 // Deklaration der enums, auf die Reagiert werden soll
 const EnumRegelgruppen = "ControlGroups";
 const EnumTemperaturTrigger = "Temperature.Trigger";
-const Vorzug = 30 * 1000;
-const MinIntervall = 3 * 60 * 1000;
+const Vorzug = 20 * 1000;
+const MinIntervall = 1 * 30 * 1000;
 let LastTimestamp = {};
 
 $(`state(${EnumRegelgruppen}=${EnumTemperaturTrigger})`).on((obj)=>{
