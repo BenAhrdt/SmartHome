@@ -36,15 +36,3 @@ function getRoomId(id){
 function callMessage(Data){
     messageTo('ThermostatActionBeforeUplink',Data);
 }
-
-
-on('alias.0.Talstrasse1A.RikasKinderzimmer.Thermostat.time',()=>{
-    log('time');
-})
-
-
-on('lorawan.1.bbea74d6-1fc5-4238-af20-d2aecdbb4f8e.devices.70b3d52dd301b3cc.uplink.raw.json',()=>{
-    log('json');
-})
-
-
