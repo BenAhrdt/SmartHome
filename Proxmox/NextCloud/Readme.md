@@ -1,5 +1,5 @@
 # 1. Anlegen eines lxc containers mit docker-compose
-Wie hier vorhehen: 
+Wie hier vorhehen: [LXC Container mit Docker anlegen](https://github.com/BenAhrdt/SmartHome/blob/main/Proxmox/Docker/LXC%20Container%20mit%20Docker%20anlegen.md)
 
 # 2. docker compose datei einfügen
 
