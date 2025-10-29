@@ -48,7 +48,7 @@ volumes:
 ```
 
 # 3. Von extern verfügbar machen:
-Um Nextcloud von extern ansprechen zu können, muss es im Niginx (oder anderen Proximanager) anktivert sein und dnach sollten folgende Schritte im container ausgeführt werden:
+Um Nextcloud von extern ansprechen zu können, muss es im Niginx (oder anderen Proxymanager) anktivert sein und dnach sollten folgende Schritte im container ausgeführt werden:
 
 ```bash
 # HTTPS für alle Links/Redirects
