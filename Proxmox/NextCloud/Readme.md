@@ -58,7 +58,7 @@ docker exec -it -u www-data nextcloud_app php occ config:system:set overwritepro
 docker exec -it -u www-data nextcloud_app php occ config:system:set overwrite.cli.url --value="https://Deine.Subdomain.xy"
 
 # Trusted domain (Hinweis unten beachten)
-docker exec -it -u www-data nextcloud_app php occ config:system:set trusted_domains 0 --value="cloud.ben-schmidt.net"
+docker exec -it -u www-data nextcloud_app php occ config:system:set trusted_domains 0 --value="Deine.Subdomain.xy"
 
 # Kontrolle
 docker exec -it -u www-data nextcloud_app php occ config:system:get overwriteprotocol
