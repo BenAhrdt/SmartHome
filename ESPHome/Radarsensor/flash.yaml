@@ -4,9 +4,9 @@ esphome:
   name_add_mac_suffix: false
 
 esp32:
-  board: esp32dev
+  variant: esp32
   framework:
-    type: arduino
+    type: esp-idf
 
 logger:
 
@@ -15,10 +15,11 @@ api:
 ota:
   platform: esphome
 
+# WLAN
 wifi:
-  networks:
-    - ssid: "Talstrasse 1A"
-      password: "pass4talstrasse1a"
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  fast_connect: true
 
 # UART für LD2450 – ggf. Pins anpassen
 uart:
@@ -29,7 +30,9 @@ uart:
 # LD2450-Komponente initialisieren (externe Komponenten nur notwendig, wenn sie nicht in ESPHome enthalten ist)
 ld2450:
   id: ld2450_radar
-  throttle: 1000ms
+
+# BLE-Tracking aktivieren
+esp32_ble_tracker:
 
 binary_sensor:   
   - platform: ld2450
@@ -111,6 +114,21 @@ sensor:
       moving_target_count:
         name: Zone-3 Moving Target Count
 
+ # Mi Flora 
+  - platform: xiaomi_hhccjcy01
+    mac_address: "5c:85:7e:13:de:ab"
+    temperature:
+      name: "Palme Temperatur"
+    moisture:
+      name: "Palme Feuchtigkeit"
+    illuminance:
+      name: "Palme Lichtstärke"
+    conductivity:
+      name: "Palme Leitfähigkeit"
+  # battery_level:
+  #   name: "Palme Batteriestand"
+    # Optional: Einstellung für Mittelwertbildung etc.
+
 number:
   - platform: ld2450
     ld2450_id: ld2450_radar
@@ -145,11 +163,12 @@ number:
         name: Zone-3 Y2
 
 
-# Optional: MQTT, falls du das nutzen möchtest
-# mqtt:
-#   broker: 192.168.1.210
-#   port: 1884
-#   username: iobroker
-#   password: Bee3n21!
-#   discovery: false
-#   topic_prefix: esp32-radar-ld2450
+# MQTT Konfiguration
+mqtt:
+  broker: !secret mqtt_broker
+  port: 1884
+  username: !secret mqtt_username
+  password: !secret mqtt_password
+  discovery: false
+  topic_prefix: Radar_Wohnzimmer
+  id: mqtt_client
