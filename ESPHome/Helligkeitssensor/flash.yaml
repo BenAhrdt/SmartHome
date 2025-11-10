@@ -4,9 +4,9 @@ esphome:
   name_add_mac_suffix: false
 
 esp32:
-  board: esp32dev
+  variant: esp32
   framework:
-    type: arduino
+    type: esp-idf
 
 logger:
 
@@ -15,25 +15,18 @@ api:
 ota:
   platform: esphome
 
+# WLAN
 wifi:
-  networks:
-    - ssid: "Talstrasse 1A"
-      password: "pass4talstrasse1a"
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  fast_connect: true
 
 i2c:
   sda: GPIO21
   scl: GPIO22
   scan: true
 
-# BLE-Tracking aktivieren
 esp32_ble_tracker:
-
-binary_sensor:
-  - platform: ble_presence
-    mac_address: "FF:FF:11:59:56:A1"
-    name: "Beacon Anwesenheit"
-    min_rssi: -85dB      # Optional: Nur anzeigen, wenn das Signal stark genug ist
-    timeout: 60s         # Optional: Nach 60 s ohne Signal auf 'abwesend' schalten
 
 sensor:
   - platform: bh1750
@@ -41,14 +34,21 @@ sensor:
     address: 0x23
     update_interval: 30s
 
-  - platform: ble_rssi
-    mac_address: "FF:FF:11:59:56:A1"
-    name: "Beacon RSSI"
-    # Optional: Einstellung für Mittelwertbildung etc.
-#mqtt:
-#  broker: 192.168.1.210
-#  port: 1884
-#  username: iobroker
-#  password: Bee3n21!
-#  discovery: false
-#  topic_prefix: esphome-web-ccc028
+  # Xiaomi Mi Scale (nur falls ESP32 BLE aktiv)
+  - platform: xiaomi_miscale
+    mac_address: "70:87:9e:6e:ba:61"
+    weight:
+      name: "Xiaomi Mi Scale Gewicht"
+      accuracy_decimals: 2
+      unit_of_measurement: "kg"
+      icon: "mdi:scale-bathroom"
+    
+# MQTT Konfiguration
+mqtt:
+  broker: !secret mqtt_broker
+  port: 1884
+  username: !secret mqtt_username
+  password: !secret mqtt_password
+  discovery: false
+  topic_prefix: Helligkeit_Flur
+  id: mqtt_client
