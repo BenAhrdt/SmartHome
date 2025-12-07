@@ -1,7 +1,7 @@
-# Zuweisen einer externen Temeratur zu einem Mclimate Vicki
-Um die Isttemperatur eines externen Sensors noch vor dem nächsten Uplink auszulesen und dem Controlstate "ExternalTemperature" zuzuweisen,
-<br/>
-kann dieses Skirpt verwendet werden.
+# Zuweisen einer Minimaltemperatur einem Mclimate Vicki bei offenem Fenster
+Um die Solltemperatur eines Vickis bei offenem Fenster herunterzufahren, muss die Öggnung des Fensters erfasst werden.
+Hierzu wird ein Boolschaes Signal benutzt.
+Um dies pro Raum abfragen zu können, wird die Rolle "sensor.window" in Kombination zu dem zugehörigen Raum (aus dem der Trigger kam) abgefragt.
 <br/>
 Es müssen folgende Konfigurationen durchgeführt werden.
 ## 1. Erstellen der Unterkategorien in der Enum "Regelgruppen"
