@@ -1,4 +1,3 @@
-
 const EnumRegelgruppen = "ControlGroups";
 const EnumGeraetesollwert = 'Temperature.DeviceTarget'; // Sollwert des Thermostats
 const EnumGeraetesollwertRueckmeldung = 'Temperature.DeviceTarget.Back'; // Aktiver Sollwert
@@ -13,7 +12,7 @@ const idZwischenspeicher = '0_userdata.0.Produktiv.Zwischenspeicher.Sollwertrege
     await new Promise(res => setTimeout(res, 50));
     zwischenspeicher = await getStateAsync(idZwischenspeicher);
     if (zwischenspeicher === null) {
-        await setStateAsync(idZwischenspeicher, JSON.stringify({'mintemperatur': 6}), true);
+        await setStateAsync(idZwischenspeicher, JSON.stringify({'absenkTemperatur': 6}), true);
     }
     zwischenspeicher = (await getStateAsync(idZwischenspeicher)).val;
     zwischenspeicher = JSON.parse(zwischenspeicher);
@@ -41,10 +40,10 @@ function ReadWindowstate(Data) {
             if (!zwischenspeicher[Data.RoomId]){
                 zwischenspeicher[Data.RoomId] = {};
             }
-            // Prüfen, ob der Sollwert undgleich der mintemperatur ist.
-            if (SelectorAktiverSollwert.getState().val !== zwischenspeicher.mintemperatur) {
+            // Prüfen, ob der Sollwert undgleich der absenkTemperatur ist.
+            if (SelectorAktiverSollwert.getState().val !== zwischenspeicher.absenkTemperatur) {
                 zwischenspeicher[Data.RoomId].sollwert = SelectorAktiverSollwert.getState().val;
-                SelectorSollwert.setState(zwischenspeicher.mintemperatur);
+                SelectorSollwert.setState(zwischenspeicher.absenkTemperatur);
                 setState(idZwischenspeicher, JSON.stringify(zwischenspeicher), true);
             }
         }
@@ -52,7 +51,7 @@ function ReadWindowstate(Data) {
         else {
             // Prüfen, ob es einen Raum und einen Sollwert im Zwischenspeicher gibt
             if (zwischenspeicher[Data.RoomId] && zwischenspeicher[Data.RoomId].sollwert) {
-                // Prüfen, ob der aktive Sollwert gleich der mintemperatur ist.
+                // Prüfen, ob der aktive Sollwert gleich der absenkTemperatur ist.
                 if (SelectorAktiverSollwert.getState().val !== zwischenspeicher[Data.RoomId].sollwert ||
                     SelectorSollwert.getState().val !== zwischenspeicher[Data.RoomId].sollwert) {
                     SelectorSollwert.setState(zwischenspeicher[Data.RoomId].sollwert);
