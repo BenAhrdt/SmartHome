@@ -5,14 +5,13 @@ Um dies pro Raum abfragen zu können, wird die Rolle "sensor.window" in Kombinat
 <br/>
 Es müssen folgende Konfigurationen durchgeführt werden.
 ## 1. Erstellen der Unterkategorien in der Enum "Regelgruppen"
-<img width="743" height="872" alt="image" src="https://github.com/user-attachments/assets/3523bcdc-26e8-4da1-aece-0dfeb8ce85cd" />
+<img width="1338" height="1300" alt="image" src="https://github.com/user-attachments/assets/86c40228-ff84-4b1c-a7b0-0f670a6a479e" />
 
 ### 1.1 Kategrieerklärung
-#### 1.1.1 Temperatur.Extern.Istwert
-Diese Kategorie dient dazu, den tatsächlichen Istwert des Raumnes zu bestimmen.
+#### 1.1.1 Temperatur.Gerätesollwert
+Diese Kategorie dient dazu, den Sollwert ans Gerät zu senden.
 
-#### 1.1.2 Temperatur.Extern.Sollwert
-Diese Kategorie gibt an, wohin dier Istwert zugewiesen werden soll. (Ziel Bspw. der ExternalTemperatur state vom Vicki).
-
-#### 1.1.3 Temperatur.Mode2
-Diese Kategorie dient dazu, dass bei einem längeren nicht Empfangen der Isttemperatur, durch den externen Sensor, das Vicki auf den Mode 1 zurückgesetzt wird. (Der Mode 2 wird also deaktiviert).
+#### 1.1.2 Temperatur.Gerätesollwert.Rückmeldung
+Diese Kategorie gibt an, welcher Sollwert im Gerät aktiv ist.
+Diese Abfrage dient dazu, falls während des offenen Fensters ein Heizplan den SOllwert verstellt,
+wird dieser als neuer Sollwert übernommen und der Sollwert auf die minimale Temperatur gesetzt.
