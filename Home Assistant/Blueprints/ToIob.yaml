@@ -38,11 +38,15 @@ condition:
     value_template: >
       {% set eid = trigger.event.data.entity_id %}
       {% set ns = trigger.event.data.new_state %}
+      {% set dev = device_id(eid) %}
       {{
         eid is not none
         and ns is not none
         and ns.state not in ['unknown','unavailable']
-        and eid in label_entities(input.sync_label)
+        and (
+          eid in label_entities(input.sync_label)
+          or (dev is not none and dev in label_devices(input.sync_label))
+        )
       }}
 
 action:
