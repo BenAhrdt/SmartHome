@@ -1,8 +1,8 @@
 blueprint:
   name: From ioBroker – Entity → HA Control
   description: >
-    Reagiert auf JSON-Steuerdaten aus ioBroker-LoRaWAN
-    (sensor.<lorawan_x>_datafromiob) und steuert HA-Entities
+    Reagiert auf JSON-Steuerdaten aus einem ioBroker-LoRaWAN-Gerät
+    (sensor.lorawan_X_datafromiob) und steuert Home-Assistant-Entities
     abhängig vom Domain-Typ.
   domain: automation
 
@@ -24,14 +24,15 @@ max: 10
 
 trigger:
   - platform: state
-    entity_id: >
-      sensor.{{ input.lorawan_instance }}_datafromiob
+    entity_id:
+      - sensor.lorawan_0_datafromiob
+      - sensor.lorawan_1_datafromiob
+      - sensor.lorawan_2_datafromiob
 
 condition:
   - condition: template
     value_template: >
-      {{ trigger.to_state is not none
-         and trigger.to_state.state not in ['unknown','unavailable',''] }}
+      {{ trigger.entity_id == 'sensor.' ~ input.lorawan_instance ~ '_datafromiob' }}
 
 action:
   - variables:
@@ -45,10 +46,7 @@ action:
           - condition: template
             value_template: "{{ domain in ['switch','light','input_boolean'] }}"
         sequence:
-          - action: >
-              {{ domain }}.turn_{{ 'on'
-                if value in [true,'true','on','1',1]
-                else 'off' }}
+          - service: "{{ domain }}.turn_{{ 'on' if value in [true,'true','on','1',1] else 'off' }}"
             target:
               entity_id: "{{ entity_id }}"
 
@@ -56,7 +54,7 @@ action:
           - condition: template
             value_template: "{{ domain == 'input_number' }}"
         sequence:
-          - action: input_number.set_value
+          - service: input_number.set_value
             target:
               entity_id: "{{ entity_id }}"
             data:
@@ -66,7 +64,7 @@ action:
           - condition: template
             value_template: "{{ domain == 'input_select' }}"
         sequence:
-          - action: input_select.select_option
+          - service: input_select.select_option
             target:
               entity_id: "{{ entity_id }}"
             data:
@@ -76,10 +74,8 @@ action:
           - condition: template
             value_template: "{{ domain == 'cover' }}"
         sequence:
-          - action: >
-              {{ 'cover.open_cover'
-                 if value in [true,'open','on','1',1]
-                 else 'cover.close_cover' }}
+          - service: >
+              {{ 'cover.open_cover' if value in [true,'open','on','1',1] else 'cover.close_cover' }}
             target:
               entity_id: "{{ entity_id }}"
 
@@ -87,14 +83,12 @@ action:
           - condition: template
             value_template: "{{ domain == 'lock' }}"
         sequence:
-          - action: >
-              {{ 'lock.lock'
-                 if value in [true,'lock','locked','on','1',1]
-                 else 'lock.unlock' }}
+          - service: >
+              {{ 'lock.lock' if value in [true,'lock','locked','on','1',1] else 'lock.unlock' }}
             target:
               entity_id: "{{ entity_id }}"
 
-  - action: system_log.write
+  - service: system_log.write
     data:
       level: warning
       message: "ioBroker command ignored: {{ trigger.to_state.state }}"
