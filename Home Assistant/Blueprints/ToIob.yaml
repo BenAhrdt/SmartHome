@@ -9,10 +9,9 @@ blueprint:
     topic_prefix:
       name: MQTT Topic Prefix
       description: z.B. lorawan_0, lorawan_1, ...
-      default: lorawan_0
       selector:
         select:
-          mode: dopdown
+          mode: dropdown
           options:
             - lorawan_0
             - lorawan_1
