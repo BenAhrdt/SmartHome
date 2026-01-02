@@ -1,0 +1,41 @@
+alias: ToIob – Erweiterte Entity & Device MQTT Bridge (SAFE)
+description: ""
+triggers:
+  - event_type: state_changed
+    trigger: event
+conditions:
+  - condition: template
+    value_template: >
+      {% set eid = trigger.event.data.entity_id %} {% set ns =
+      trigger.event.data.new_state %} {{
+        eid is not none
+        and ns is not none
+        and ns.state not in ['unknown','unavailable']
+        and eid in label_entities('ToIob')
+      }}
+actions:
+  - data:
+      topic: lorawan_1/lorawan_1/lorawan_1_bridge_datatoiob/set
+      retain: false
+      payload: >
+        {% set eid = trigger.event.data.entity_id %} {% set ns =
+        trigger.event.data.new_state %} {% set dev = device_id(eid) %} {
+          "{{ eid }}": {{
+            dict(
+              ns.attributes
+              | combine({
+                  "state": ns.state,
+                  "last_changed": ns.last_changed | string,
+                  "last_updated": ns.last_updated | string,
+                  "device": {
+                    "name": device_attr(dev, 'name') | default('unknown'),
+                    "manufacturer": device_attr(dev, 'manufacturer') | default('unknown'),
+                    "model": device_attr(dev, 'model') | default('unknown')
+                  }
+              })
+            ) | tojson
+          }}
+        }
+    action: mqtt.publish
+mode: queued
+max: 10
