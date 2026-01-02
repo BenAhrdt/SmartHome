@@ -18,10 +18,9 @@ blueprint:
             - lorawan_1
             - lorawan_2
 
-
     sync_label:
       name: Entity Label
-      description: Nur Entities mit diesem Label werden gesendet
+      description: Label kann an Entity ODER Gerät hängen
       default: ToIob
       selector:
         text:
@@ -51,6 +50,9 @@ condition:
 
 action:
   - variables:
+      # Blueprint-Input korrekt in Variable überführen
+      topic_prefix: !input topic_prefix
+
       eid: "{{ trigger.event.data.entity_id }}"
       ns: "{{ trigger.event.data.new_state }}"
       dev: "{{ device_id(eid) }}"
@@ -58,7 +60,7 @@ action:
   - action: mqtt.publish
     data:
       topic: >
-        {{ input.topic_prefix }}/{{ input.topic_prefix }}/{{ input.topic_prefix }}_bridge_datatoiob/set
+        {{ topic_prefix }}/{{ topic_prefix }}/{{ topic_prefix }}_bridge_datatoiob/set
       retain: false
       payload: >
         {
