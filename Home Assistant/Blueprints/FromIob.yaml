@@ -1,17 +1,23 @@
 blueprint:
   name: From ioBroker – Entity → HA Control
   description: >
-    Reagiert auf JSON-Steuerdaten aus einem ioBroker-LoRaWAN-Gerät
-    (sensor.<instance>_datafromiob) und steuert HA-Entities abhängig vom Domain-Typ.
+    Reagiert auf JSON-Steuerdaten aus ioBroker-LoRaWAN
+    (sensor.<lorawan_x>_datafromiob) und steuert HA-Entities
+    abhängig vom Domain-Typ.
   domain: automation
 
   input:
-    lorawan_device:
-      name: LoRaWAN ioBroker Device
-      description: Wähle die ioBroker-LoRaWAN-Instanz (lorawan.0, lorawan.1, …)
+    lorawan_instance:
+      name: LoRaWAN Instanz
+      description: Wähle die ioBroker-LoRaWAN-Instanz
+      default: lorawan_0
       selector:
-        device:
-          integration: iobroker
+        select:
+          mode: dropdown
+          options:
+            - lorawan_0
+            - lorawan_1
+            - lorawan_2
 
 mode: queued
 max: 10
@@ -19,10 +25,7 @@ max: 10
 trigger:
   - platform: state
     entity_id: >
-      {{ device_entities(!input lorawan_device)
-         | select('match', 'sensor\\..*_datafromiob$')
-         | list
-         | first }}
+      sensor.{{ input.lorawan_instance }}_datafromiob
 
 condition:
   - condition: template
@@ -43,7 +46,9 @@ action:
             value_template: "{{ domain in ['switch','light','input_boolean'] }}"
         sequence:
           - action: >
-              {{ domain }}.turn_{{ 'on' if value in [true,'true','on','1',1] else 'off' }}
+              {{ domain }}.turn_{{ 'on'
+                if value in [true,'true','on','1',1]
+                else 'off' }}
             target:
               entity_id: "{{ entity_id }}"
 
@@ -72,7 +77,9 @@ action:
             value_template: "{{ domain == 'cover' }}"
         sequence:
           - action: >
-              {{ 'cover.open_cover' if value in [true,'open','on','1',1] else 'cover.close_cover' }}
+              {{ 'cover.open_cover'
+                 if value in [true,'open','on','1',1]
+                 else 'cover.close_cover' }}
             target:
               entity_id: "{{ entity_id }}"
 
@@ -81,11 +88,13 @@ action:
             value_template: "{{ domain == 'lock' }}"
         sequence:
           - action: >
-              {{ 'lock.lock' if value in [true,'lock','locked','on','1',1] else 'lock.unlock' }}
+              {{ 'lock.lock'
+                 if value in [true,'lock','locked','on','1',1]
+                 else 'lock.unlock' }}
             target:
               entity_id: "{{ entity_id }}"
 
   - action: system_log.write
     data:
       level: warning
-      message: "ioBroker entity command ignored: {{ trigger.to_state.state }}"
+      message: "ioBroker command ignored: {{ trigger.to_state.state }}"
