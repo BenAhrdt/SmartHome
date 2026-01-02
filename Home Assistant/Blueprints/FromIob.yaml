@@ -1,0 +1,82 @@
+blueprint:
+  name: From ioBroker – MQTT → Entity
+  description: >
+    Empfängt MQTT-Befehle von ioBroker und steuert
+    Home-Assistant-Entities abhängig vom Domain-Typ.
+  domain: automation
+
+  input:
+    topic_prefix:
+      name: MQTT Topic Prefix
+      description: z.B. lorawan_0, lorawan_1, ...
+      default: lorawan_0
+      selector:
+        text:
+
+mode: queued
+max: 10
+
+trigger:
+  - platform: mqtt
+    topic: >
+      {{ input.topic_prefix }}/{{ input.topic_prefix }}/{{ input.topic_prefix }}_bridge_datafromiob/state
+
+action:
+  - variables:
+      payload: "{{ trigger.payload_json }}"
+      entity_id: "{{ payload.keys() | list | first }}"
+      value: "{{ payload[entity_id] }}"
+      domain: "{{ entity_id.split('.')[0] }}"
+
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ domain in ['switch','light','input_boolean'] }}"
+        sequence:
+          - action: >
+              {{ domain }}.turn_{{ 'on' if value in [true,'true','on','1',1] else 'off' }}
+            target:
+              entity_id: "{{ entity_id }}"
+
+      - conditions:
+          - condition: template
+            value_template: "{{ domain == 'input_number' }}"
+        sequence:
+          - action: input_number.set_value
+            target:
+              entity_id: "{{ entity_id }}"
+            data:
+              value: "{{ value }}"
+
+      - conditions:
+          - condition: template
+            value_template: "{{ domain == 'input_select' }}"
+        sequence:
+          - action: input_select.select_option
+            target:
+              entity_id: "{{ entity_id }}"
+            data:
+              option: "{{ value }}"
+
+      - conditions:
+          - condition: template
+            value_template: "{{ domain == 'cover' }}"
+        sequence:
+          - action: >
+              {{ 'cover.open_cover' if value in [true,'open','on','1',1] else 'cover.close_cover' }}
+            target:
+              entity_id: "{{ entity_id }}"
+
+      - conditions:
+          - condition: template
+            value_template: "{{ domain == 'lock' }}"
+        sequence:
+          - action: >
+              {{ 'lock.lock' if value in [true,'lock','locked','on','1',1] else 'lock.unlock' }}
+            target:
+              entity_id: "{{ entity_id }}"
+
+  - action: system_log.write
+    data:
+      level: warning
+      message: "ioBroker MQTT command ignored: {{ trigger.payload }}"
