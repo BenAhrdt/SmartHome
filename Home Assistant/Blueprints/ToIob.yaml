@@ -12,6 +12,7 @@ blueprint:
       default: lorawan_0
       selector:
         select:
+          mode: dropdown
           options:
             - lorawan_0
             - lorawan_1
