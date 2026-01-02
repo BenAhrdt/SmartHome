@@ -1,34 +1,38 @@
 blueprint:
-  name: From IoBroker – MQTT → Entity
+  name: From ioBroker – Entity → HA Control
   description: >
-    Empfängt MQTT-Befehle von ioBroker und steuert
-    Home-Assistant-Entities abhängig vom Domain-Typ.
+    Reagiert auf JSON-Steuerdaten aus einem ioBroker-LoRaWAN-Gerät
+    (sensor.<instance>_datafromiob) und steuert HA-Entities abhängig vom Domain-Typ.
   domain: automation
 
   input:
-    topic_prefix:
-      name: MQTT Topic Prefix
-      description: z.B. lorawan_0, lorawan_1, ...
-      default: lorawan_0
+    lorawan_device:
+      name: LoRaWAN ioBroker Device
+      description: Wähle die ioBroker-LoRaWAN-Instanz (lorawan.0, lorawan.1, …)
       selector:
-        select:
-          mode: dropdown
-          options:
-            - lorawan_0
-            - lorawan_1
-            - lorawan_2
+        device:
+          integration: iobroker
 
 mode: queued
 max: 10
 
 trigger:
-  - platform: mqtt
-    topic: >
-      {{ input.topic_prefix }}/{{ input.topic_prefix }}/{{ input.topic_prefix }}_bridge_datafromiob/state
+  - platform: state
+    entity_id: >
+      {{ device_entities(!input lorawan_device)
+         | select('match', 'sensor\\..*_datafromiob$')
+         | list
+         | first }}
+
+condition:
+  - condition: template
+    value_template: >
+      {{ trigger.to_state is not none
+         and trigger.to_state.state not in ['unknown','unavailable',''] }}
 
 action:
   - variables:
-      payload: "{{ trigger.payload_json }}"
+      payload: "{{ trigger.to_state.state | from_json }}"
       entity_id: "{{ payload.keys() | list | first }}"
       value: "{{ payload[entity_id] }}"
       domain: "{{ entity_id.split('.')[0] }}"
@@ -84,4 +88,4 @@ action:
   - action: system_log.write
     data:
       level: warning
-      message: "ioBroker MQTT command ignored: {{ trigger.payload }}"
+      message: "ioBroker entity command ignored: {{ trigger.to_state.state }}"
