@@ -1,5 +1,5 @@
 blueprint:
-  name: To ioBroker – Entity → MQTT
+  name: To IoBroker – Entity → MQTT
   description: >
     Sendet State-Änderungen markierter Home-Assistant-Entities
     strukturiert via MQTT an ioBroker.
@@ -11,7 +11,12 @@ blueprint:
       description: z.B. lorawan_0, lorawan_1, ...
       default: lorawan_0
       selector:
-        text:
+        select:
+          options:
+            - lorawan_0
+            - lorawan_1
+            - lorawan_2
+
 
     sync_label:
       name: Entity Label
