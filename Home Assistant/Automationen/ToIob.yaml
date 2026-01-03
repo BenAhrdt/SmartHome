@@ -1,4 +1,4 @@
-alias: ToIob – Erweiterte Entity & Device MQTT Bridge (SAFE)
+alias: DataToIOb_LoRaWAN_0
 description: ""
 triggers:
   - event_type: state_changed
@@ -7,34 +7,50 @@ conditions:
   - condition: template
     value_template: >
       {% set eid = trigger.event.data.entity_id %} {% set ns =
-      trigger.event.data.new_state %} {{
+      trigger.event.data.new_state %} {% set dev = device_id(eid) %} {% set
+      entity_labels = label_entities('ToIob') | default([]) %} {% set
+      device_labels = label_devices('ToIob') | default([]) %} {{
         eid is not none
         and ns is not none
         and ns.state not in ['unknown','unavailable']
-        and eid in label_entities('ToIob')
+        and (
+          eid in entity_labels
+          or (dev is not none and dev in device_labels)
+        )
       }}
 actions:
   - data:
-      topic: lorawan_1/lorawan_1/lorawan_1_bridge_datatoiob/set
+      topic: lorawan_0/lorawan_0/lorawan_0_bridge_datatoiob/set
       retain: false
       payload: >
         {% set eid = trigger.event.data.entity_id %} {% set ns =
         trigger.event.data.new_state %} {% set dev = device_id(eid) %} {
-          "{{ eid }}": {{
-            dict(
-              ns.attributes
-              | combine({
-                  "state": ns.state,
-                  "last_changed": ns.last_changed | string,
-                  "last_updated": ns.last_updated | string,
-                  "device": {
-                    "name": device_attr(dev, 'name') | default('unknown'),
-                    "manufacturer": device_attr(dev, 'manufacturer') | default('unknown'),
-                    "model": device_attr(dev, 'model') | default('unknown')
-                  }
-              })
-            ) | tojson
-          }}
+          "entities": {
+            "{{ eid }}": {{
+              dict(
+                ns.attributes
+                | combine({
+                    "entity_id": eid,
+                    "unique_id": ns.attributes.unique_id | default(eid),
+                    "friendly_name": ns.attributes.friendly_name | default(eid),
+                    "state": ns.state,
+                    "last_changed": ns.last_changed | string,
+                    "last_updated": ns.last_updated | string,
+
+                    "device_class": ns.attributes.device_class | default(None),
+                    "state_class": ns.attributes.state_class | default(None),
+                    "unit_of_measurement": ns.attributes.unit_of_measurement | default(None),
+
+                    "device": {
+                      "id": dev,
+                      "name": device_attr(dev, 'name') | default('unknown'),
+                      "manufacturer": device_attr(dev, 'manufacturer') | default('unknown'),
+                      "model": device_attr(dev, 'model') | default('unknown')
+                    }
+                })
+              ) | tojson
+            }}
+          }
         }
     action: mqtt.publish
 mode: queued
