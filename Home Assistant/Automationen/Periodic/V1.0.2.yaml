@@ -1,0 +1,61 @@
+alias: DataToIOb_LoRaWAN_0_Periodic
+description: Sendet alle markierten Entitäten gesammelt zyklisch an ioBroker
+triggers:
+  - minutes: /1
+    trigger: time_pattern
+actions:
+  - action: mqtt.publish
+    data:
+      topic: lorawan_0/lorawan_0/lorawan_0_bridge_datatoiob/set
+      retain: false
+      payload: >-
+        {% set entity_labels = label_entities('ToIob') | default([]) %} {% set
+        device_labels = label_devices('ToIob') | default([]) %} {% set ns =
+        namespace(items={}) %}
+
+        {% for s in states %}
+          {% set eid = s.entity_id %}
+          {% set dev = device_id(eid) %}
+          {% set domain = eid.split('.')[0] %}
+          {% set available = s.state not in ['unknown', 'unavailable'] %}
+
+          {% if
+            eid in entity_labels
+            or (dev is not none and dev in device_labels)
+          %}
+            {% set ns.items = ns.items | combine({
+              eid: dict(
+                s.attributes
+                | combine({
+                    "entity_id": eid,
+                    "domain": domain,
+                    "unique_id": s.attributes.unique_id | default(eid),
+                    "friendly_name": s.attributes.friendly_name | default(eid),
+                    "state": s.state,
+                    "available": available,
+                    "last_changed": s.last_changed | string,
+                    "last_updated": s.last_updated | string,
+                    "device_class": s.attributes.device_class | default(None),
+                    "state_class": s.attributes.state_class | default(None),
+                    "unit_of_measurement": s.attributes.unit_of_measurement | default(None),
+                    "device": {
+                      "id": dev,
+                      "name": (
+                        device_attr(dev, 'name_by_user')
+                        or device_attr(dev, 'name')
+                        or 'unknown'
+                      ),
+                      "manufacturer": device_attr(dev, 'manufacturer') | default('unknown'),
+                      "model": device_attr(dev, 'model') | default('unknown')
+                    }
+                })
+              )
+            }) %}
+          {% endif %}
+        {% endfor %}
+
+        {
+          "version": "1.0.2",
+          "discovery": true,
+          "entities": {{ ns.items | tojson }}
+        }
