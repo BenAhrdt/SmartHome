@@ -16,6 +16,7 @@ actions:
         {% for s in states %}
           {% set eid = s.entity_id %}
           {% set dev = device_id(eid) %}
+          {% set domain = eid.split('.')[0] %}
           {% if
             s.state not in ['unknown','unavailable']
             and (
@@ -28,6 +29,7 @@ actions:
                 s.attributes
                 | combine({
                     "entity_id": eid,
+                    "domain": domain,
                     "unique_id": s.attributes.unique_id | default(eid),
                     "friendly_name": s.attributes.friendly_name | default(eid),
                     "state": s.state,
@@ -49,6 +51,7 @@ actions:
         {% endfor %}
 
         {
+          "version": "1.0.0",
           "discovery": true,
           "entities": {{ ns.items | tojson }}
         }
