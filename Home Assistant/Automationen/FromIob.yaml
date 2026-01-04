@@ -1,74 +1,58 @@
-alias: Data FromIoB LoraWAN 0
-description: Empfängt Steuerbefehle von ioBroker via MQTT
+alias: DataToIOb_LoRaWAN_0_Periodic
+description: Sendet alle markierten Entitäten gesammelt zyklisch an ioBroker
 triggers:
-  - topic: lorawan_0/lorawan_0/lorawan_0_bridge_datafromiob/state
-    trigger: mqtt
+  - minutes: /1
+    trigger: time_pattern
 actions:
-  - variables:
-      payload: "{{ trigger.payload_json }}"
-      entity_id: "{{ payload.keys() | list | first }}"
-      value: "{{ payload[entity_id] }}"
-      domain: "{{ entity_id.split('.')[0] }}"
-  - choose:
-      - conditions:
-          - condition: template
-            value_template: "{{ domain in ['switch', 'input_boolean', 'light'] }}"
-        sequence:
-          - target:
-              entity_id: "{{ entity_id }}"
-            action: |
-              {% if value in [true, 'true', 'on', '1', 1] %}
-                {{ domain }}.turn_on
-              {% elif value in [false, 'false', 'off', '0', 0] %}
-                {{ domain }}.turn_off
-              {% else %}
-                none
-              {% endif %}
-      - conditions:
-          - condition: template
-            value_template: "{{ domain == 'input_number' }}"
-        sequence:
-          - target:
-              entity_id: "{{ entity_id }}"
-            data:
-              value: "{{ value }}"
-            action: input_number.set_value
-      - conditions:
-          - condition: template
-            value_template: "{{ domain == 'input_select' }}"
-        sequence:
-          - target:
-              entity_id: "{{ entity_id }}"
-            data:
-              option: "{{ value }}"
-            action: input_select.select_option
-      - conditions:
-          - condition: template
-            value_template: "{{ domain == 'cover' }}"
-        sequence:
-          - target:
-              entity_id: "{{ entity_id }}"
-            action: |
-              {% if value in [true, 'open', 'on', '1', 1] %}
-                cover.open_cover
-              {% else %}
-                cover.close_cover
-              {% endif %}
-      - conditions:
-          - condition: template
-            value_template: "{{ domain == 'lock' }}"
-        sequence:
-          - target:
-              entity_id: "{{ entity_id }}"
-            action: |
-              {% if value in [true, 'lock', 'locked', 'on', '1', 1] %}
-                lock.lock
-              {% else %}
-                lock.unlock
-              {% endif %}
-  - data:
-      level: warning
-      message: "IoBroker MQTT command ignored: {{ trigger.payload }}"
-    action: system_log.write
-mode: queued
-max: 10
+  - action: mqtt.publish
+    data:
+      topic: lorawan_0/lorawan_0/lorawan_0_bridge_datatoiob/set
+      retain: false
+      payload: >-
+        {% set entity_labels = label_entities('ToIob') | default([]) %} {% set
+        device_labels = label_devices('ToIob') | default([]) %} {% set ns =
+        namespace(items={}) %}
+
+        {% for s in states %}
+          {% set eid = s.entity_id %}
+          {% set dev = device_id(eid) %}
+          {% set domain = eid.split('.')[0] %}
+          {% if
+            s.state not in ['unknown','unavailable']
+            and (
+              eid in entity_labels
+              or (dev is not none and dev in device_labels)
+            )
+          %}
+            {% set ns.items = ns.items | combine({
+              eid: dict(
+                s.attributes
+                | combine({
+                    "entity_id": eid,
+                    "domain": domain,
+                    "unique_id": s.attributes.unique_id | default(eid),
+                    "friendly_name": s.attributes.friendly_name | default(eid),
+                    "state": s.state,
+                    "last_changed": s.last_changed | string,
+                    "last_updated": s.last_updated | string,
+                    "device_class": s.attributes.device_class | default(None),
+                    "state_class": s.attributes.state_class | default(None),
+                    "unit_of_measurement": s.attributes.unit_of_measurement | default(None),
+                    "device": {
+                      "id": dev,
+                      "name": device_attr(dev, 'name') | default('unknown'),
+                      "manufacturer": device_attr(dev, 'manufacturer') | default('unknown'),
+                      "model": device_attr(dev, 'model') | default('unknown')
+                    }
+                })
+              )
+            }) %}
+          {% endif %}
+        {% endfor %}
+
+        {
+          "version": "1.0.0",
+          "discovery": true,
+          "entities": {{ ns.items | tojson }}
+        }
+mode: single
