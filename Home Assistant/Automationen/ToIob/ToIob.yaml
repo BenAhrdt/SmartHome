@@ -1,43 +1,48 @@
-alias: DataToIOb_LoRaWAN_0_Periodic
-description: Sendet alle markierten Entitäten gesammelt zyklisch an ioBroker
+alias: DataToIOb_LoRaWAN_0
+description: ""
 triggers:
-  - minutes: /1
-    trigger: time_pattern
+  - event_type: state_changed
+    trigger: event
+conditions:
+  - condition: template
+    value_template: >
+      {% set eid = trigger.event.data.entity_id %} {% set ns =
+      trigger.event.data.new_state %} {% set dev = device_id(eid) %} {% set
+      entity_labels = label_entities('ToIob') | default([]) %} {% set
+      device_labels = label_devices('ToIob') | default([]) %} {{
+        eid is not none
+        and ns is not none
+        and ns.state not in ['unknown','unavailable']
+        and (
+          eid in entity_labels
+          or (dev is not none and dev in device_labels)
+        )
+      }}
 actions:
   - action: mqtt.publish
     data:
       topic: lorawan_0/lorawan_0/lorawan_0_bridge_datatoiob/set
       retain: false
-      payload: >-
-        {% set entity_labels = label_entities('ToIob') | default([]) %} {% set
-        device_labels = label_devices('ToIob') | default([]) %} {% set ns =
-        namespace(items={}) %}
-
-        {% for s in states %}
-          {% set eid = s.entity_id %}
-          {% set dev = device_id(eid) %}
-          {% set domain = eid.split('.')[0] %}
-          {% if
-            s.state not in ['unknown','unavailable']
-            and (
-              eid in entity_labels
-              or (dev is not none and dev in device_labels)
-            )
-          %}
-            {% set ns.items = ns.items | combine({
-              eid: dict(
-                s.attributes
+      payload: >
+        {% set eid = trigger.event.data.entity_id %} {% set ns =
+        trigger.event.data.new_state %} {% set dev = device_id(eid) %} {% set
+        domain = eid.split('.')[0] %} {
+          "version": "1.0.0",
+          "entities": {
+            "{{ eid }}": {{
+              dict(
+                ns.attributes
                 | combine({
                     "entity_id": eid,
                     "domain": domain,
-                    "unique_id": s.attributes.unique_id | default(eid),
-                    "friendly_name": s.attributes.friendly_name | default(eid),
-                    "state": s.state,
-                    "last_changed": s.last_changed | string,
-                    "last_updated": s.last_updated | string,
-                    "device_class": s.attributes.device_class | default(None),
-                    "state_class": s.attributes.state_class | default(None),
-                    "unit_of_measurement": s.attributes.unit_of_measurement | default(None),
+                    "unique_id": ns.attributes.unique_id | default(eid),
+                    "friendly_name": ns.attributes.friendly_name | default(eid),
+                    "state": ns.state,
+                    "last_changed": ns.last_changed | string,
+                    "last_updated": ns.last_updated | string,
+                    "device_class": ns.attributes.device_class | default(None),
+                    "state_class": ns.attributes.state_class | default(None),
+                    "unit_of_measurement": ns.attributes.unit_of_measurement | default(None),
                     "device": {
                       "id": dev,
                       "name": device_attr(dev, 'name') | default('unknown'),
@@ -45,14 +50,9 @@ actions:
                       "model": device_attr(dev, 'model') | default('unknown')
                     }
                 })
-              )
-            }) %}
-          {% endif %}
-        {% endfor %}
-
-        {
-          "version": "1.0.0",
-          "discovery": true,
-          "entities": {{ ns.items | tojson }}
+              ) | tojson
+            }}
+          }
         }
-mode: single
+mode: queued
+max: 10
