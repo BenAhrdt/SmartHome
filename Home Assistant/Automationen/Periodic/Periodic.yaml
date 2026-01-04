@@ -17,12 +17,11 @@ actions:
           {% set eid = s.entity_id %}
           {% set dev = device_id(eid) %}
           {% set domain = eid.split('.')[0] %}
+          {% set available = s.state not in ['unknown', 'unavailable'] %}
+
           {% if
-            s.state not in ['unknown','unavailable']
-            and (
-              eid in entity_labels
-              or (dev is not none and dev in device_labels)
-            )
+            eid in entity_labels
+            or (dev is not none and dev in device_labels)
           %}
             {% set ns.items = ns.items | combine({
               eid: dict(
@@ -33,6 +32,7 @@ actions:
                     "unique_id": s.attributes.unique_id | default(eid),
                     "friendly_name": s.attributes.friendly_name | default(eid),
                     "state": s.state,
+                    "available": available,
                     "last_changed": s.last_changed | string,
                     "last_updated": s.last_updated | string,
                     "device_class": s.attributes.device_class | default(None),
@@ -41,7 +41,7 @@ actions:
                     "device": {
                       "id": dev,
                       "name": (
-                      device_attr(dev, 'name_by_user')
+                        device_attr(dev, 'name_by_user')
                         or device_attr(dev, 'name')
                         or 'unknown'
                       ),
@@ -55,8 +55,7 @@ actions:
         {% endfor %}
 
         {
-          "version": "1.0.1",
+          "version": "1.0.2",
           "discovery": true,
           "entities": {{ ns.items | tojson }}
         }
-mode: single
