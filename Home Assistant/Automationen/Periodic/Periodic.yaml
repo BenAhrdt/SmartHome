@@ -1,7 +1,7 @@
 alias: DataToIOb_LoRaWAN_0_Periodic
 description: Sendet alle markierten Entitäten gesammelt zyklisch an ioBroker
 triggers:
-  - minutes: /10
+  - minutes: /1
     trigger: time_pattern
 actions:
   - action: mqtt.publish
@@ -40,7 +40,11 @@ actions:
                     "unit_of_measurement": s.attributes.unit_of_measurement | default(None),
                     "device": {
                       "id": dev,
-                      "name": device_attr(dev, 'name') | default('unknown'),
+                      "name": (
+                      device_attr(dev, 'name_by_user')
+                        or device_attr(dev, 'name')
+                        or 'unknown'
+                      ),
                       "manufacturer": device_attr(dev, 'manufacturer') | default('unknown'),
                       "model": device_attr(dev, 'model') | default('unknown')
                     }
@@ -51,7 +55,7 @@ actions:
         {% endfor %}
 
         {
-          "version": "1.0.0",
+          "version": "1.0.1",
           "discovery": true,
           "entities": {{ ns.items | tojson }}
         }
