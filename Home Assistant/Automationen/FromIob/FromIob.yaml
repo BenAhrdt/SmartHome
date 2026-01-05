@@ -12,6 +12,13 @@ actions:
   - choose:
       - conditions:
           - condition: template
+            value_template: "{{ domain == 'button' }}"
+        sequence:
+          - action: button.press
+            target:
+              entity_id: "{{ entity_id }}"
+      - conditions:
+          - condition: template
             value_template: "{{ domain == 'text' }}"
         sequence:
           - action: text.set_value
@@ -30,7 +37,7 @@ actions:
               value: "{{ value | string }}"
       - conditions:
           - condition: template
-            value_template: "{{ domain in ['switch', 'light', 'input_boolean'] }}"
+            value_template: "{{ domain in ['switch','light','input_boolean'] }}"
         sequence:
           - action: >
               {{ domain }}.turn_{{ 'on' if value in [true,'true','on','1',1]
@@ -39,18 +46,18 @@ actions:
               entity_id: "{{ entity_id }}"
       - conditions:
           - condition: template
-            value_template: "{{ domain == 'input_number' }}"
+            value_template: "{{ domain == 'number' }}"
         sequence:
-          - action: input_number.set_value
+          - action: number.set_value
             target:
               entity_id: "{{ entity_id }}"
             data:
               value: "{{ value }}"
       - conditions:
           - condition: template
-            value_template: "{{ domain == 'number' }}"
+            value_template: "{{ domain == 'input_number' }}"
         sequence:
-          - action: number.set_value
+          - action: input_number.set_value
             target:
               entity_id: "{{ entity_id }}"
             data:
