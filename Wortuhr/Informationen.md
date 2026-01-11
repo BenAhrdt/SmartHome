@@ -2,7 +2,8 @@
 ## 1. Idee
 Die Idee war eine Wortuhr als Eye-catcher in einem DIY Projekt zu bauen.
 
-Grundlage für dieses Proejkt ist das ESP-Wordclock repository: https://github.com/ESPWortuhr/Multilayout-ESP-Wordclock
+Grundlage für dieses Proejkt ist das ESP-Wordclock Repository: https://github.com/ESPWortuhr/Multilayout-ESP-Wordclock
+Genutzt habe ich einen ESP 8266 um dort die Firware aus dem Repository drauf zu flashen.
 
 ## 2. Materialien
 Die Materialien sind allerdings teilweise für erschwingleiche Preise zu haben.
