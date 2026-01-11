@@ -21,7 +21,7 @@ https://www.leuchtbildshop.net/epages/64015097.sf/de_DE/?ObjectPath=/Shops/64015
 Ich habe hier Extraweiß gewählt.
 
 ### 2.2 Rückplatte
-Als Rückplatte habe ich eine 2mm MDF Platte genommen und diese an die Rückseitige Aussparung angepasst.
+Als Rückplatte habe ich eine 2mm MDF Platte genommen und diese an die Rückseitige Aussparung angepasst. (370 x 370mm)
 <img width="521" height="522" alt="image" src="https://github.com/user-attachments/assets/e597ff52-3446-4aa0-92a1-4f0ae7e22857" />
 
 ## 3. Ausbringen der LED Stripes
