@@ -9,7 +9,8 @@ denn einige Komponenten sind schon für erschwingleiche Beträge im Netz zu beko
 
 ### 2.1 Rahmen
 Ich entschied mich für eine Uhr im Format 500 x 500 mm.
-Hier konnte ich beim Leuchtmittelschop folgenden Rahmen finden:
+Hier konnte ich beim Leuchbildshop folgenden Rahmen finden:
 <img width="279" height="291" alt="image" src="https://github.com/user-attachments/assets/88113dd7-4416-4229-b080-3b4c0d56401f" />
+<br/>
 https://www.leuchtbildshop.net/epages/64015097.sf/de_DE/?ObjectPath=/Shops/64015097/Products/CL-50er-ZP-01/SubProducts/CL-50er-ZP-01
 
