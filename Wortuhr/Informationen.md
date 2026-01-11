@@ -14,3 +14,8 @@ Den Rahmen habe ich bei Leuchtbildshop.de gefunden.<br/>
 <br/>
 https://www.leuchtbildshop.net/epages/64015097.sf/de_DE/?ObjectPath=/Shops/64015097/Products/CL-50er-ZP-01/SubProducts/CL-50er-ZP-01
 
+Dort gabe es auch die Diffusorfolie:
+<img width="520" height="515" alt="image" src="https://github.com/user-attachments/assets/3b37a386-e4c6-4fdf-8e98-0d816998a71e" />
+https://www.leuchtbildshop.net/epages/64015097.sf/de_DE/?ObjectPath=/Shops/64015097/Categories/Diffusionsfolien
+Ich habe hier Extraweiß gewählt..
+
