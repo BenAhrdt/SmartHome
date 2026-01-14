@@ -37,4 +37,7 @@ Das Ergebnis in den Rahmen eingabaut brachte folgendes Ergebnis:
 <img width="781" height="915" alt="image" src="https://github.com/user-attachments/assets/9bf8452a-7f32-4552-88a7-2dbee80b2ee8" />
 <img width="584" height="772" alt="image" src="https://github.com/user-attachments/assets/dca5a083-4980-4ac8-9957-871601bb8328" />
 
+## 4. Fixieren der Rückplatte
+Ich habe die Rückplatte an den Ecken noch jeweils mit einem "Niederhalter" fixiert.
+<img width="643" height="620" alt="image" src="https://github.com/user-attachments/assets/b6d733ec-45da-49eb-a008-d95def4caa17" />
 
