@@ -41,3 +41,6 @@ Das Ergebnis in den Rahmen eingabaut brachte folgendes Ergebnis:
 Ich habe die Rückplatte an den Ecken noch jeweils mit einem "Niederhalter" fixiert.
 <img width="643" height="620" alt="image" src="https://github.com/user-attachments/assets/b6d733ec-45da-49eb-a008-d95def4caa17" />
 
+## 5. Grundplatte
+Die Fertig aufgehängte Frundplatte sieht so aus:
+<img width="494" height="473" alt="image" src="https://github.com/user-attachments/assets/45e55f53-d419-47c3-b606-2ee6f45ded50" />
