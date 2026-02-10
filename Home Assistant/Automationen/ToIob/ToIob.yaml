@@ -19,45 +19,89 @@ conditions:
         )
       }}
 actions:
-  - action: mqtt.publish
-    data:
+  - data:
       topic: lorawan_0/lorawan_0/lorawan_0_bridge_datatoiob/set
       retain: false
       payload: >
         {% set eid = trigger.event.data.entity_id %} {% set ns =
         trigger.event.data.new_state %} {% set dev = device_id(eid) %} {% set
-        domain = eid.split('.')[0] %} {
-          "version": "1.0.2",
+        domain = eid.split('.')[0] %}
+
+        {# ---------- ATTRIBUTES (nur Zustandswerte) ---------- #} {% set
+        ns_attr = namespace(data={}) %} {% set exclude = [
+          'friendly_name',
+          'icon',
+          'supported_color_modes',
+          'effect_list',
+          'device_class',
+          'state_class',
+          'unit_of_measurement'
+        ] %} {% for k, v in ns.attributes.items() %}
+          {% if k not in exclude %}
+            {% set ns_attr.data = ns_attr.data | combine({ k: v }) %}
+          {% endif %}
+        {% endfor %}
+
+        {# ---------- CAPABILITIES ---------- #} {% set ns_caps =
+        namespace(data={}) %}
+
+        {# supported color modes #} {% if ns.attributes.supported_color_modes is
+        defined %}
+          {% set ns_caps.data = ns_caps.data | combine({
+            "supported_color_modes": ns.attributes.supported_color_modes
+          }) %}
+        {% endif %}
+
+        {# effect_list -> ioBroker states mapping #} {% if
+        ns.attributes.effect_list is defined %}
+          {% set states = namespace(data={}) %}
+          {% for e in ns.attributes.effect_list %}
+            {% set states.data = states.data | combine({
+              (loop.index0 | string): e
+            }) %}
+          {% endfor %}
+          {% set ns_caps.data = ns_caps.data | combine({
+            "effects": {
+              "states": states.data
+            }
+          }) %}
+        {% endif %}
+
+        {
+          "version": "1.1.0",
           "entities": {
-            "{{ eid }}": {{
-              dict(
-                ns.attributes
-                | combine({
-                    "entity_id": eid,
-                    "available": true,
-                    "domain": domain,
-                    "unique_id": ns.attributes.unique_id | default(eid),
-                    "friendly_name": ns.attributes.friendly_name | default(eid),
-                    "state": ns.state,
-                    "last_changed": ns.last_changed | string,
-                    "last_updated": ns.last_updated | string,
-                    "device_class": ns.attributes.device_class | default(None),
-                    "state_class": ns.attributes.state_class | default(None),
-                    "unit_of_measurement": ns.attributes.unit_of_measurement | default(None),
-                    "device": {
-                      "id": dev,
-                      "name": (
-                      device_attr(dev, 'name_by_user')
-                        or device_attr(dev, 'name')
-                        or 'unknown'
-                      ),
-                      "manufacturer": device_attr(dev, 'manufacturer') | default('unknown'),
-                      "model": device_attr(dev, 'model') | default('unknown')
-                    }
-                })
-              ) | tojson
-            }}
+            "{{ eid }}": {
+              "entity_id": "{{ eid }}",
+              "domain": "{{ domain }}",
+              "state": "{{ ns.state }}",
+              "available": true,
+
+              "unique_id": "{{ ns.attributes.unique_id | default(eid) }}",
+              "friendly_name": "{{ ns.attributes.friendly_name | default(eid) }}",
+              "device_class": {{ ns.attributes.device_class | default(None) | tojson }},
+              "state_class": {{ ns.attributes.state_class | default(None) | tojson }},
+              "unit_of_measurement": {{ ns.attributes.unit_of_measurement | default(None) | tojson }},
+              "last_changed": "{{ ns.last_changed }}",
+              "last_updated": "{{ ns.last_updated }}",
+
+              "attributes": {{ ns_attr.data | tojson }},
+              "capabilities": {{ ns_caps.data | tojson }},
+
+              "device": {
+                "id": "{{ dev }}",
+                "name": {{
+                  (
+                    device_attr(dev, 'name_by_user')
+                    or device_attr(dev, 'name')
+                    or 'unknown'
+                  ) | tojson
+                }},
+                "manufacturer": {{ device_attr(dev, 'manufacturer') | default('unknown') | tojson }},
+                "model": {{ device_attr(dev, 'model') | default('unknown') | tojson }}
+              }
+            }
           }
         }
+    action: mqtt.publish
 mode: queued
 max: 10
