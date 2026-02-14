@@ -1,10 +1,11 @@
 alias: DataToIOb_LoRaWAN_0_Periodic
 description: Sendet alle markierten Entitäten gesammelt zyklisch an ioBroker
 triggers:
-  - minutes: /10
-    trigger: time_pattern
+  - trigger: time_pattern
+    minutes: /1
 actions:
-  - data:
+  - action: mqtt.publish
+    data:
       topic: lorawan_0/lorawan_0/lorawan_0_bridge_datatoiob/set
       retain: false
       payload: >
@@ -20,7 +21,7 @@ actions:
 
           {% if eid in entity_labels or (dev is not none and dev in device_labels) %}
 
-            {# ---------- ATTRIBUTES (nur Zustandswerte) ---------- #}
+            {# ---------- ATTRIBUTES ---------- #}
             {% set ns_attr = namespace(data={}) %}
             {% set exclude = [
               'friendly_name',
@@ -31,6 +32,7 @@ actions:
               'state_class',
               'unit_of_measurement'
             ] %}
+
             {% for k, v in s.attributes.items() %}
               {% if k not in exclude %}
                 {% set ns_attr.data = ns_attr.data | combine({ k: v }) %}
@@ -40,12 +42,14 @@ actions:
             {# ---------- CAPABILITIES ---------- #}
             {% set ns_caps = namespace(data={}) %}
 
+            {# Light: supported_color_modes #}
             {% if s.attributes.supported_color_modes is defined %}
               {% set ns_caps.data = ns_caps.data | combine({
                 "supported_color_modes": s.attributes.supported_color_modes
               }) %}
             {% endif %}
 
+            {# Light: effect_list -> states mapping #}
             {% if s.attributes.effect_list is defined %}
               {% set states_map = namespace(data={}) %}
               {% for e in s.attributes.effect_list %}
@@ -59,6 +63,32 @@ actions:
                 }
               }) %}
             {% endif %}
+
+            {# Cover: Commands exakt wie Change #}
+        {% if domain == 'cover' and s.attributes.supported_features is defined %}
+          {% set features = s.attributes.supported_features | int(0) %}
+          {% set cmd_states = namespace(data={}) %}
+        
+          {% if (features // 1) % 2 == 1 %}
+            {% set cmd_states.data = cmd_states.data | combine({ "1": "open" }) %}
+          {% endif %}
+        
+          {% if (features // 2) % 2 == 1 %}
+            {% set cmd_states.data = cmd_states.data | combine({ "2": "close" }) %}
+          {% endif %}
+        
+          {% if (features // 8) % 2 == 1 %}
+            {% set cmd_states.data = cmd_states.data | combine({ "8": "stop" }) %}
+          {% endif %}
+        
+          {% if cmd_states.data %}
+            {% set ns_caps.data = ns_caps.data | combine({
+              "commands": {
+                "states": cmd_states.data
+              }
+            }) %}
+          {% endif %}
+        {% endif %}
 
             {% set ns.items = ns.items | combine({
               eid: {
@@ -95,10 +125,9 @@ actions:
         {% endfor %}
 
         {
-          "version": "1.1.0",
+          "version": "1.1.1",
           "discovery": true,
           "entities": {{ ns.items | tojson }}
         }
-    action: mqtt.publish
 mode: queued
 max: 2
