@@ -11,29 +11,109 @@ actions:
           - condition: template
             value_template: |
               {{ payload.entity_id is defined
-                 and payload.attribute == 'temperature'
-                 and payload.entity_id.split('.')[0] == 'climate' }}
+                 and payload.attribute == 'command'
+                 and payload.entity_id.split('.')[0] == 'lock' }}
         sequence:
-          - target:
+          - variables:
+              cmd: "{{ payload.value | string | lower | trim }}"
+          - action: |
+              {% if cmd == 'lock' %}
+                lock.lock
+              {% elif cmd == 'unlock' %}
+                lock.unlock
+              {% elif cmd == 'open' %}
+                lock.open
+              {% else %}
+                none
+              {% endif %}
+            target:
               entity_id: "{{ payload.entity_id }}"
-            data:
-              temperature: "{{ payload.value }}"
-            action: climate.set_temperature
       - conditions:
           - condition: template
             value_template: |
               {{ payload.entity_id is defined
-                 and payload.attribute is defined
-                 and payload.value is defined }}
+                 and payload.attribute == 'temperature'
+                 and payload.entity_id.split('.')[0] == 'climate' }}
+        sequence:
+          - action: climate.set_temperature
+            target:
+              entity_id: "{{ payload.entity_id }}"
+            data:
+              temperature: "{{ payload.value | float }}"
+      - conditions:
+          - condition: template
+            value_template: |
+              {{ payload.entity_id is defined
+                 and payload.attribute == 'humidity'
+                 and payload.entity_id.split('.')[0] == 'humidifier' }}
+        sequence:
+          - action: humidifier.set_humidity
+            target:
+              entity_id: "{{ payload.entity_id }}"
+            data:
+              humidity: "{{ payload.value | int }}"
+      - conditions:
+          - condition: template
+            value_template: |
+              {{ payload.entity_id is defined
+                 and payload.attribute == 'mode'
+                 and payload.entity_id.split('.')[0] == 'humidifier' }}
+        sequence:
+          - action: humidifier.set_mode
+            target:
+              entity_id: "{{ payload.entity_id }}"
+            data:
+              mode: "{{ payload.value }}"
+      - conditions:
+          - condition: template
+            value_template: |
+              {{ payload.entity_id is defined
+                 and payload.entity_id.split('.')[0] == 'light'
+                 and payload.attribute is defined }}
+        sequence:
+          - action: light.turn_on
+            target:
+              entity_id: "{{ payload.entity_id }}"
+            data:
+              "{{ payload.attribute }}": |
+                {% if payload.attribute in ['brightness','transition'] %}
+                  {{ payload.value | int }}
+                {% else %}
+                  {{ payload.value }}
+                {% endif %}
+      - conditions:
+          - condition: template
+            value_template: |
+              {{ payload.entity_id is defined
+                 and payload.attribute == 'command'
+                 and payload.entity_id.split('.')[0] == 'cover' }}
         sequence:
           - variables:
+              cmd: "{{ payload.value | string | lower | trim }}"
+          - action: |
+              {% if cmd == 'open' %}
+                cover.open_cover
+              {% elif cmd == 'close' %}
+                cover.close_cover
+              {% elif cmd == 'stop' %}
+                cover.stop_cover
+              {% else %}
+                none
+              {% endif %}
+            target:
               entity_id: "{{ payload.entity_id }}"
-              domain: "{{ payload.entity_id.split('.')[0] }}"
-          - target:
-              entity_id: "{{ entity_id }}"
+      - conditions:
+          - condition: template
+            value_template: |
+              {{ payload.entity_id is defined
+                 and payload.attribute == 'position'
+                 and payload.entity_id.split('.')[0] == 'cover' }}
+        sequence:
+          - action: cover.set_cover_position
+            target:
+              entity_id: "{{ payload.entity_id }}"
             data:
-              "{{ payload.attribute }}": "{{ payload.value }}"
-            action: "{{ domain }}.turn_on"
+              position: "{{ payload.value | int }}"
   - choose:
       - conditions:
           - condition: template
@@ -48,87 +128,50 @@ actions:
                   - condition: template
                     value_template: "{{ domain == 'button' }}"
                 sequence:
-                  - target:
+                  - action: button.press
+                    target:
                       entity_id: "{{ entity_id }}"
-                    action: button.press
               - conditions:
                   - condition: template
-                    value_template: "{{ domain == 'text' }}"
+                    value_template: >
+                      {{ domain in
+                      ['switch','light','input_boolean','humidifier'] }}
                 sequence:
-                  - target:
-                      entity_id: "{{ entity_id }}"
-                    data:
-                      value: "{{ value | string }}"
-                    action: text.set_value
-              - conditions:
-                  - condition: template
-                    value_template: "{{ domain == 'input_text' }}"
-                sequence:
-                  - target:
-                      entity_id: "{{ entity_id }}"
-                    data:
-                      value: "{{ value | string }}"
-                    action: input_text.set_value
-              - conditions:
-                  - condition: template
-                    value_template: "{{ domain in ['switch','light','input_boolean'] }}"
-                sequence:
-                  - target:
-                      entity_id: "{{ entity_id }}"
-                    action: |
+                  - action: |
                       {{ domain }}.turn_{{ 'on'
                         if value in [true,'true','on','1',1]
                         else 'off' }}
-              - conditions:
-                  - condition: template
-                    value_template: "{{ domain == 'number' }}"
-                sequence:
-                  - target:
+                    target:
                       entity_id: "{{ entity_id }}"
-                    data:
-                      value: "{{ value }}"
-                    action: number.set_value
-              - conditions:
-                  - condition: template
-                    value_template: "{{ domain == 'input_number' }}"
-                sequence:
-                  - target:
-                      entity_id: "{{ entity_id }}"
-                    data:
-                      value: "{{ value }}"
-                    action: input_number.set_value
-              - conditions:
-                  - condition: template
-                    value_template: "{{ domain == 'input_select' }}"
-                sequence:
-                  - target:
-                      entity_id: "{{ entity_id }}"
-                    data:
-                      option: "{{ value }}"
-                    action: input_select.select_option
               - conditions:
                   - condition: template
                     value_template: "{{ domain == 'cover' }}"
                 sequence:
-                  - target:
+                  - action: |
+                      {% if value in ['open','on',true,'1',1] %}
+                        cover.open_cover
+                      {% elif value in ['stop','8',8] %}
+                        cover.stop_cover
+                      {% else %}
+                        cover.close_cover
+                      {% endif %}
+                    target:
                       entity_id: "{{ entity_id }}"
-                    action: |
-                      {{ 'cover.open_cover'
-                        if value in [true,'open','on','1',1]
-                        else 'cover.close_cover' }}
               - conditions:
                   - condition: template
                     value_template: "{{ domain == 'lock' }}"
                 sequence:
-                  - target:
+                  - action: |
+                      {% if value in ['lock','on',true,'1',1] %}
+                        lock.lock
+                      {% else %}
+                        lock.unlock
+                      {% endif %}
+                    target:
                       entity_id: "{{ entity_id }}"
-                    action: |
-                      {{ 'lock.lock'
-                        if value in [true,'lock','locked','on','1',1]
-                        else 'lock.unlock' }}
-  - data:
+  - action: system_log.write
+    data:
       level: warning
-      message: "ioBroker MQTT command ignored: {{ trigger.payload }}"
-    action: system_log.write
+      message: "ioBroker MQTT command processed: {{ trigger.payload }}"
 mode: queued
 max: 10
