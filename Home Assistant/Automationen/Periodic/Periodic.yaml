@@ -2,7 +2,7 @@ alias: DataToIOb_LoRaWAN_0_Periodic
 description: Sendet alle markierten Entitäten gesammelt zyklisch an ioBroker
 triggers:
   - trigger: time_pattern
-    minutes: /1
+    minutes: /10
 actions:
   - action: mqtt.publish
     data:
