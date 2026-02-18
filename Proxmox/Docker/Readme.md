@@ -8,7 +8,7 @@ apt install curl -y
 ```
 ## 2. Skript ausgühren
 ```bash
-curl -fsSL https://raw.githubusercontent.com/BenAhrdt/SmartHome/main/Proxmox/Docker/install.sh | bash -s -- homebox
+curl -fsSL https://raw.githubusercontent.com/BenAhrdt/SmartHome/main/Proxmox/Docker/install.sh | bash -s -- NameDeinerAnwendung
 ```
 ## 3. Compose file füllen
 ```bash
