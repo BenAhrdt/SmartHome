@@ -10,7 +10,7 @@ apt install curl -y
 ```bash
 curl -O https://raw.githubusercontent.com/BenAhrdt/SmartHome/main/Proxmox/Docker/install.sh
 chmod +x install.sh
-./install.sh NameDeinerAnwendung
+. install.sh NameDeinerAnwendung
 ```
 ## 3. Compose file füllen
 ```bash
