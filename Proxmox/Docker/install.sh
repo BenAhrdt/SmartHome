@@ -7,15 +7,6 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-# App-Name als Parameter (Standard: myapp)
-APP_NAME=${1:-myapp}
-INSTALL_DIR="/opt/$APP_NAME"
-
-echo "======================================"
-echo "App-Name: $APP_NAME"
-echo "Installationsverzeichnis: $INSTALL_DIR"
-echo "======================================"
-
 echo "=== System wird aktualisiert ==="
 apt update && apt upgrade -y && apt autoremove -y
 
@@ -36,9 +27,5 @@ apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
 echo "=== Docker-Version prüfen ==="
 docker --version
 docker compose version
-
-echo "=== Verzeichnis wird vorbereitet ==="
-mkdir -p "$INSTALL_DIR"
-cd "$INSTALL_DIR"
 
 echo "Fertig ✅"
