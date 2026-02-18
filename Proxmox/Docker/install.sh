@@ -41,7 +41,4 @@ echo "=== Verzeichnis wird vorbereitet ==="
 mkdir -p "$INSTALL_DIR"
 cd "$INSTALL_DIR"
 
-echo "=== docker-compose.yml wird geöffnet ==="
-nano docker-compose.yml
-
 echo "Fertig ✅"
