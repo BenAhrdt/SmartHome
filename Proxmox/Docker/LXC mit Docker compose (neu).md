@@ -36,3 +36,17 @@ docker --version
 ```bash
 docker compose version
 ```
+## 8. Hier geht es weiter mit dem Beispiel des HomeBox Compose
+```bash
+mkdir -p /opt/homebox
+```
+```bash
+cd /opt/homebox
+```
+```bash
+nano docker-compose.yml
+```
+Compose file einfügen und dann:
+```bash
+docker compose up -d
+```
