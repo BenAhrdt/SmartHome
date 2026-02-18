@@ -6,7 +6,7 @@ apt update
 ```bash
 apt install curl -y
 ```
-## 2. Skript ausgühren
+## 2. Skript ausgühren (Anwendungsname beachten)
 ```bash
 curl -fsSL https://raw.githubusercontent.com/BenAhrdt/SmartHome/main/Proxmox/Docker/install.sh | bash -s -- NameDeinerAnwendung
 ```
