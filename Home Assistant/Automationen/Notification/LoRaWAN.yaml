@@ -13,4 +13,33 @@ actions:
     data:
       message: "{{ trigger.payload }}"
       title: LoRaWAN Adapter
+  - action: mqtt.publish
+    data:
+      topic: lorawan_0/lorawan_0/lorawan_0_bridge_datatoiob/set
+      retain: false
+      payload: |
+        {% set ns = namespace(devices={}) %}
+        {% for s in states %}
+          {% set dev = device_id(s.entity_id) %}
+
+          {% if dev is not none and dev not in ns.devices.values() | map(attribute='deviceId') | list %}
+            {% set identifiers = device_attr(dev, 'identifiers') or [] %}
+
+            {% for id_tuple in identifiers %}
+              {% if id_tuple[0] == 'mqtt' %}
+                {% set identifier_name = id_tuple[1] %}
+                {% set ns.devices = ns.devices | combine({
+                  identifier_name: {
+                    "deviceId": dev
+                  }
+                }) %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+        {
+          "version": "1.1.1",
+          "deviceIds": true,
+          "devices": {{ ns.devices | tojson }}
+        }
 mode: single
