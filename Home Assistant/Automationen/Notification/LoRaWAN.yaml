@@ -2,7 +2,7 @@ alias: LoRaWAN 0
 description: ""
 triggers:
   - domain: mqtt
-    device_id: f979f033e7e0a37d0e321c566956be2a
+    device_id: 
     type: notification
     subtype: general
     trigger: device
