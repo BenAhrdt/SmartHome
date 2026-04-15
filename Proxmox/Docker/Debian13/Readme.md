@@ -2,9 +2,12 @@
 
 ## 1. System vorbereiten
 Paketliste aktualisieren und `curl` installieren:
+```bash
+```
 apt update
+```bash
 apt install -y curl
-
+```
 ## 2. Installationsskript ausführen
 Das Docker-Installationsskript direkt herunterladen und ausführen:
 curl -fsSL https://raw.githubusercontent.com/BenAhrdt/SmartHome/main/Proxmox/Docker/install.sh | bash
