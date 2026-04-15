@@ -31,7 +31,30 @@ cd /mnt/data
 ls -la
 ```
 am Besten reboot
-# 3. Docker Compose file anlegen
+# 3. Docker compose env datei anlegen
+```bash
+nano docker-compose.env
+```
+Inhalt der Datei:
+```bash
+# URL zulassen intern und extern
+PAPERLESS_URL=https://paperless.ben-schmidt.net
+PAPERLESS_CSRF_TRUSTED_ORIGINS=https://paperless.ben-schmidt.net,http://192.168.2.225:8000
+PAPERLESS_PROXY_SSL_HEADER=["HTTP_X_FORWARDED_PROTO", "https"]
+
+# Sicherheit
+PAPERLESS_SECRET_KEY=Dein generierter Key
+PAPERLESS_ADMIN_USER=Dein Username
+PAPERLESS_ADMIN_PASSWORD=Dein Passwort
+
+# OCR
+PAPERLESS_OCR_LANGUAGE=deu+eng
+
+# User Mapping
+USERMAP_UID=1026
+USERMAP_GID=100
+```
+# 4. Docker Compose file anlegen
 ```bash
 nano docker-compose.yml
 ```
