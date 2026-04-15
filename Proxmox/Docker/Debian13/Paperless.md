@@ -87,3 +87,7 @@ volumes:
   media:
   redisdata:
 ```
+# 5. docker compose starten
+```bash
+docker compose up -d
+```
