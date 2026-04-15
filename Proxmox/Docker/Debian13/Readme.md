@@ -11,7 +11,7 @@ apt install -y curl
 ## 2. Installationsskript ausführen
 Das Docker-Installationsskript direkt herunterladen und ausführen:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/BenAhrdt/SmartHome/main/Proxmox/Docker/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/BenAhrdt/SmartHome/main/Proxmox/Docker/Debian13/install.sh | bash
 ```
 ## 3. Docker Compose Datei erstellen
 Compose-Datei anlegen bzw. bearbeiten:
