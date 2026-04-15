@@ -10,7 +10,7 @@ nano /etc/fstab
 ```
 Inhalt der Datei:
 ```bash
-192.168.2.80:/volume1/Proxmox/Paperless    /mnt/data nfs auto,rw,sync,hard,intr 0 0
+192.168.2.80:/volume1/Proxmox/Paperless /mnt/data nfs defaults,_netdev,x-systemd.automount 0 0
 ```
 ```bash
 cd /mnt
