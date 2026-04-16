@@ -102,8 +102,8 @@ nano docker-compose.env
 Inhalt der Datei:
 ```bash
 # URL zulassen intern und extern
-PAPERLESS_URL=https://paperless.ben-schmidt.net
-PAPERLESS_CSRF_TRUSTED_ORIGINS=https://paperless.ben-schmidt.net,http://192.168.2.225:8000
+PAPERLESS_URL=https://paperless.DeineDomain.de
+PAPERLESS_CSRF_TRUSTED_ORIGINS=https://paperless.DeineDomain.de,http://192.168.2.225:8000
 PAPERLESS_PROXY_SSL_HEADER=["HTTP_X_FORWARDED_PROTO", "https"]
 
 # Sicherheit
