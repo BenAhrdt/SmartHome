@@ -117,6 +117,9 @@ PAPERLESS_OCR_LANGUAGE=deu+eng
 # User Mapping
 USERMAP_UID=1026
 USERMAP_GID=100
+
+#Polling
+PAPERLESS_CONSUMER_POLLING=1
 ```
 Docker starten
 ```bash
