@@ -25,10 +25,11 @@ systemctl daemon-reload
 mount /mnt/data
 ```
 ```bash
-
+ls -l /mnt/data
 ```
+Optionaler Schreibtest
 ```bash
-
+touch /mnt/data/schreibtest.txt && ls -l /mnt/data/schreibtest.txt
 ```
 ```bash
 
