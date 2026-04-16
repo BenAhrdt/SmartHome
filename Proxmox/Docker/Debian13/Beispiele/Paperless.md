@@ -15,7 +15,7 @@ nano /etc/fstab
 ```
 Inhalt der Datei:
 ```bash
-192.168.2.80:/volume1/Proxmox/Paperless2  /mnt/data  nfs  defaults,_netdev,x-systemd.automount,x-systemd.mount-timeout=30  0  0
+192.168.2.80:/volume1/Proxmox/Paperless  /mnt/data  nfs  defaults,_netdev  0  0
 ```
 Aktivieren und Prüfen
 ```bash
@@ -31,12 +31,27 @@ Optionaler Schreibtest
 ```bash
 touch /mnt/data/schreibtest.txt && ls -l /mnt/data/schreibtest.txt
 ```
+RCP Dienst dauerhaft aktiviern
 ```bash
-
+systemctl unmask rpcbind
 ```
 ```bash
-
+systemctl enable rpcbind
 ```
 ```bash
-
+systemctl start rpcbind
+```
+Skript zum Warten auf das Netzwerk
+```bash
+nano /etc/network/if-up.d/fstab-mount
+```
+Inhalt der Datei:
+```bash
+#!/bin/sh
+# Erzwingt den Mount aus der fstab, sobald das Netz da ist
+mount -a
+```
+Berechtigeung setzen
+```bash
+chmod +x /etc/network/if-up.d/fstab-mount
 ```
