@@ -55,3 +55,60 @@ Berechtigeung setzen
 ```bash
 chmod +x /etc/network/if-up.d/fstab-mount
 ```
+Gerne reboot und prüfen, ob noch daten  gemouted sind.
+
+## 3. Docker installieren
+```bash
+apt install docker.io docker-compose -y
+```
+## 4. Docker-Compose datein anlegen
+Docker-compose.yml anlegen
+```bash
+nano docker-compose.yml
+```
+Inhalt der Datei
+```bash
+# URL zulassen intern und extern
+PAPERLESS_URL=https://paperless.ben-schmidt.net
+PAPERLESS_CSRF_TRUSTED_ORIGINS=https://paperless.ben-schmidt.net,http://192.168.2.225:8000
+PAPERLESS_PROXY_SSL_HEADER=["HTTP_X_FORWARDED_PROTO", "https"]
+
+# Sicherheit
+PAPERLESS_SECRET_KEY=Dein generierter Key
+PAPERLESS_ADMIN_USER=Dein Username
+PAPERLESS_ADMIN_PASSWORD=Dein Passwort
+
+# OCR
+PAPERLESS_OCR_LANGUAGE=deu+eng
+
+# User Mapping
+USERMAP_UID=1026
+USERMAP_GID=100
+```
+Docker-compose-env anlegen
+```bash
+nano docker-compose.env
+```
+Inhalt der Datei:
+```bash
+# URL zulassen intern und extern
+PAPERLESS_URL=https://paperless.ben-schmidt.net
+PAPERLESS_CSRF_TRUSTED_ORIGINS=https://paperless.ben-schmidt.net,http://192.168.2.225:8000
+PAPERLESS_PROXY_SSL_HEADER=["HTTP_X_FORWARDED_PROTO", "https"]
+
+# Sicherheit
+PAPERLESS_SECRET_KEY=Dein generierter Key
+PAPERLESS_ADMIN_USER=Dein Username
+PAPERLESS_ADMIN_PASSWORD=Dein Passwort
+
+# OCR
+PAPERLESS_OCR_LANGUAGE=deu+eng
+
+# User Mapping
+USERMAP_UID=1026
+USERMAP_GID=100
+```
+Docker starten
+```bash
+docker compose up -d
+```
