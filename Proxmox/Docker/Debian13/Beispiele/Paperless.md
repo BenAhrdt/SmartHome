@@ -18,10 +18,6 @@ apt update && apt install nfs-common -y
 ```bash
 mkdir -p /mnt/data
 ```
-Ordner anlegen, sofern nicht da
-```bash
-mkdir -p /mnt/data/{data,consume,export,media,redisdata}
-```
 ```bash
 nano /etc/fstab
 ```
@@ -35,6 +31,10 @@ systemctl daemon-reload
 ```
 ```bash
 mount /mnt/data
+```
+Ordner anlegen, sofern nicht da
+```bash
+mkdir -p /mnt/data/{data,consume,export,media,redisdata}
 ```
 ```bash
 ls -l /mnt/data
