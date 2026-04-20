@@ -18,6 +18,10 @@ apt update && apt install nfs-common -y
 ```bash
 mkdir -p /mnt/data
 ```
+Ordner anlegen, sofern nicht da
+```bash
+mkdir -p data consume export media redisdata
+```
 ```bash
 nano /etc/fstab
 ```
