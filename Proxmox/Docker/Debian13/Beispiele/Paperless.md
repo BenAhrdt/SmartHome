@@ -112,6 +112,7 @@ Key erzeugen und für die folgende .env datei nutzen
 ```bash
 openssl rand -hex 32
 ```
+```bash
 nano docker-compose.env
 ```
 Inhalt der Datei:
