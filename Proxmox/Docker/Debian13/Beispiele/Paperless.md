@@ -4,7 +4,7 @@
 lxc-Container unprivilegiert
 2 CPU-Cores für kleine/ mittlere Setups, 4 CPU-Cores wenn mehrere Konsumenten parallel Dokumente liefern bzw. OCR intensiv genutzt wird
 2 GB RAM Minimum / 4 GB RAM ausgewogen für OCR + Web-UI / 8 GB für viele Konsumentenh, pdf-Files > 50 MB oder andere Dienste im lxc
-8-16 GB Storage für Paperless + 50-500 GB für Data (1TB für Data bei großen Archiven)
+8-16 GB Storage für Paperless + 50-500 GB für Data (1TB für Data bei großen Archiven) (bei nicht gemouteten Daten wichtig)
 1-2 GB SWAP-Speicher (4GB für OCR-Spitzen)
 
 ## 1. Frisch erstellten Debian 13 LXC updaten
