@@ -107,7 +107,7 @@ volumes:
   media:
   redisdata:
 ```
-Docker-compose-env anlegen
+Docker-compose-env anlegen</br>
 Key erzeugen und für die folgende .env datei nutzen
 ```bash
 openssl rand -hex 32
