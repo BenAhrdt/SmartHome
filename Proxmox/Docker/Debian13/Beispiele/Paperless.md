@@ -109,6 +109,10 @@ volumes:
 ```
 Docker-compose-env anlegen
 ```bash
+Key erzeugen und für die folgende .env datei nutzen
+```bash
+openssl rand -hex 32
+```
 nano docker-compose.env
 ```
 Inhalt der Datei:
