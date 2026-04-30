@@ -4,8 +4,6 @@ Wie hier vorhehen: [LXC Container mit Docker anlegen](https://github.com/BenAhrd
 # 2. docker compose datei einfügen
 
 ```bash
-version: '3.9'
-
 services:
   db:
     image: mariadb:10.6
