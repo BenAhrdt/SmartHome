@@ -4,16 +4,14 @@ const EnumIsttemperaturExternIstwert = "Temperature.External.State"; // Istwert 
 const EnumIsttemperaturExternSollwert = "Temperature.External.Set";  // Externser Sollwert (Downlink an Thermostat)
 const EnumTemperaturMode2 = "Temperature.Mode2";
 const MaxDifferenz = 2 * 60 * 60 * 1000; // 2 Stunden
-const extTempSensor = {};
+const MinTempDifferenz = 0; // Hier kann die Minimale Abweichung zum control.externalTemperture eingetragen werden.
 
 const IstTempArray = $(`state(${EnumRegelgruppen}=${EnumIsttemperaturExternIstwert})`).toArray();
 
-on(IstTempArray,(dp)=>{
-    const roomId = getRoomId(dp.id);
-    extTempSensor[roomId] = {
-        tempChange: true
-    }
-});
+function isDifferent(current, act, minDifference) {
+    const difference = Math.abs(current - act);
+    return difference >= minDifference; 
+}
 
 // Auf einen externen Aufruf reagieren
 onMessage('ThermostatActionBeforeUplink',(Data)=>{
@@ -30,12 +28,9 @@ function ReadTemperature(Data){
         const Jetzt = Date.now();
         const Isttemperatur = SelectorIsttemperatur.getState();
         if((Jetzt - Isttemperatur.ts) <= MaxDifferenz){
-            if (!extTempSensor[Data.RoomId] || extTempSensor[Data.RoomId].tempChange) {
-                extTempSensor[Data.RoomId] = {
-                    tempChange: false
-                }
+            const IsttemperaturExternal = SelectorIsttemperaturExternal.getState();
+            if(isDifferent(Isttemperatur.val, IsttemperaturExternal.val, MinTempDifferenz)) {
                 SelectorIsttemperaturExternal.setState(Isttemperatur.val);
-                //log(`Zugewiesen: ${Isttemperatur.val}°C`);
             }
         }
         else{
