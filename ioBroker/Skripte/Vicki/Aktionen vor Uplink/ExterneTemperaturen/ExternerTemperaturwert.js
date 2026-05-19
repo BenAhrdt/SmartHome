@@ -4,7 +4,7 @@ const EnumIsttemperaturExternIstwert = "Temperature.External.State"; // Istwert 
 const EnumIsttemperaturExternSollwert = "Temperature.External.Set";  // Externser Sollwert (Downlink an Thermostat)
 const EnumTemperaturMode2 = "Temperature.Mode2";
 const MaxDifferenz = 2 * 60 * 60 * 1000; // 2 Stunden
-const MinTempDifferenz = 0; // Hier kann die Minimale Abweichung zum control.externalTemperture eingetragen werden.
+const MinTempDifferenz = 0.01; // Hier kann die Minimale Abweichung zum control.externalTemperture eingetragen werden.
 
 const IstTempArray = $(`state(${EnumRegelgruppen}=${EnumIsttemperaturExternIstwert})`).toArray();
 
