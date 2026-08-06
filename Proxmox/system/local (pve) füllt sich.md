@@ -1,7 +1,15 @@
 # Local (pve) ist fast voll
 <img width="1611" height="631" alt="image" src="https://github.com/user-attachments/assets/2820a239-62b8-4c2a-990b-5220465f88e5" />
 
-Wenn dich das local(pve) immer weiter füllt, dann können folgende Befehlee helfen:
+Wenn dich das local(pve) immer weiter füllt:
+
+Check, ob es an Updatedateien liegt (generell an welchen):
+
+```bash
+du -hx / | sort -rh | head -n 20
+```
+
+Wenn es an Updatedateien liegt, dann können folgende Befehlee helfen:
 
 ```bash
 apt-get clean
