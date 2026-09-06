@@ -1,8 +1,8 @@
 blueprint:
-  name: HEIMAN Smoke Sensor – Manager v0.3.0
+  name: HEIMAN Smoke Sensor – Manager v0.4.0
   author: Benjamin Schmidt
   description: >
-    Version: 0.3.0
+    Version: 0.4.0
 
     Zentrale Verwaltung für HEIMAN "Smoke sensor"-Rauchmelder.
 
@@ -13,20 +13,14 @@ blueprint:
       - Selbsttest nacheinander ausführen
       - Selbsttest gleichzeitig ausführen
 
-    Die automatischen Alarmfunktionen verwenden gezielte State-Trigger.
-    Es wird KEIN globaler state_changed-Event überwacht.
-
-    Für die automatischen Funktionen müssen die zugehörigen
-    Batteriewarnungs- und Rauchalarm-Entitäten einmalig ausgewählt werden.
-
-    Optional können einzelne HEIMAN Rauchmelder als Gerätefilter
-    ausgewählt werden. Bleibt diese Auswahl leer, gelten die manuellen
-    Funktionen für alle HEIMAN Geräte mit Modell "Smoke sensor".
+    Optional können einzelne HEIMAN Rauchmelder ausgewählt werden.
+    Bleibt die Geräteauswahl leer, werden automatisch alle Geräte mit
+    Hersteller "HEIMAN" und Modell "Smoke sensor" berücksichtigt.
 
     Manuelle Funktionen werden über das Event
     "heiman_smoke_sensor_action" gestartet.
 
-    Unterstützte Werte für event_data.funktion:
+    event_data.funktion:
       - batterie
       - selbsttest_sequentiell
       - selbsttest_synchron
@@ -34,17 +28,11 @@ blueprint:
   domain: automation
 
   input:
-
     smoke_sensors:
       name: HEIMAN Rauchmelder
       description: >
-        Optionaler Gerätefilter.
-
-        Leer lassen = alle HEIMAN Rauchmelder mit Modell "Smoke sensor".
-
-        Werden Geräte ausgewählt, gelten Batterieabfrage und Selbsttests
-        nur für diese Geräte. Auch automatische Alarmmeldungen werden
-        zusätzlich auf diese Geräte beschränkt.
+        Optional. Leer lassen = alle HEIMAN Rauchmelder mit
+        Modell "Smoke sensor".
       default: []
       selector:
         device:
@@ -53,441 +41,347 @@ blueprint:
             - manufacturer: HEIMAN
               model: Smoke sensor
 
-    battery_warning_entities:
-      name: Batteriewarnungs-Entitäten
-      description: >
-        Alle Batteriewarnungs-Binary-Sensoren der HEIMAN Rauchmelder
-        auswählen.
-
-        Diese Entitäten werden direkt durch Home Assistant überwacht.
-      selector:
-        entity:
-          multiple: true
-          filter:
-            - domain: binary_sensor
-              device:
-                manufacturer: HEIMAN
-                model: Smoke sensor
-
-    smoke_alarm_entities:
-      name: Rauchalarm-Entitäten
-      description: >
-        Alle Rauchalarm-Binary-Sensoren der HEIMAN Rauchmelder auswählen.
-
-        Das sind bei deiner bisherigen Namensgebung die Entitäten,
-        deren Entity-ID auf "_rauch" endet.
-      selector:
-        entity:
-          multiple: true
-          filter:
-            - domain: binary_sensor
-              device:
-                manufacturer: HEIMAN
-                model: Smoke sensor
-
     output_text:
       name: Ausgabe-Entität
       description: >
-        input_text-Entität, in die Status- und Ergebnismeldungen
-        als JSON geschrieben werden.
+        input_text-Entität für die JSON-Ausgabe,
+        z. B. PushoverMessage.
       selector:
         entity:
           filter:
             - domain: input_text
 
 
-###############################################################################
-# TRIGGER
-###############################################################################
-
 triggers:
+  - trigger: event
+    event_type: state_changed
+    id: state_changed
 
-  # Batteriewarnung:
-  # Nur konkret ausgewählte Entitäten werden von HA überwacht.
-  - trigger: state
-    entity_id: !input battery_warning_entities
-    to: "on"
-    id: battery_warning
-
-  # Rauchalarm:
-  # Nur konkret ausgewählte Entitäten werden von HA überwacht.
-  - trigger: state
-    entity_id: !input smoke_alarm_entities
-    to: "on"
-    id: smoke_alarm
-
-  # Manuelle Funktionen vom Dashboard.
   - trigger: event
     event_type: heiman_smoke_sensor_action
-    id: manual_action
+    id: manual
 
 
 conditions: []
 
 
-###############################################################################
-# AKTIONEN
-###############################################################################
-
 actions:
+  ###########################################################################
+  # EINGABEN + AUSLÖSER AUSWERTEN
+  ###########################################################################
 
   - variables:
       selected_devices: !input smoke_sensors
       output_entity: !input output_text
 
+      event_entity: >-
+        {% if trigger.id == 'state_changed' %}
+          {{ trigger.event.data.entity_id | default('') }}
+        {% else %}
+          {{ '' }}
+        {% endif %}
 
-  - choose:
+      event_device: >-
+        {% if trigger.id == 'state_changed'
+              and trigger.event.data.entity_id is defined %}
+          {{ device_id(trigger.event.data.entity_id) | default('', true) }}
+        {% else %}
+          {{ '' }}
+        {% endif %}
 
-      #########################################################################
-      # 1. BATTERIEWARNUNG AUTOMATISCH
-      #########################################################################
+      funktion: >-
+        {% if trigger.id == 'manual' %}
+          {{ trigger.event.data.funktion | default('') }}
 
-      - conditions:
+        {% elif trigger.id == 'state_changed'
+              and trigger.event.data.new_state is not none
+              and trigger.event.data.old_state is not none
+              and trigger.event.data.new_state.state == 'on'
+              and trigger.event.data.old_state.state != 'on'
+              and 'batteriewarnung'
+                  in trigger.event.data.entity_id %}
+          batteriewarnung
 
-          - condition: trigger
-            id: battery_warning
+        {% elif trigger.id == 'state_changed'
+              and trigger.event.data.new_state is not none
+              and trigger.event.data.old_state is not none
+              and trigger.event.data.new_state.state == 'on'
+              and trigger.event.data.old_state.state != 'on'
+              and trigger.event.data.entity_id.endswith('_rauch') %}
+          rauchalarm
 
+        {% else %}
+          ignorieren
+        {% endif %}
+
+
+  ###########################################################################
+  # NUR RELEVANTE STATE_CHANGED-EREIGNISSE WEITERLASSEN
+  ###########################################################################
+
+  - condition: template
+    value_template: >-
+      {% if trigger.id == 'manual' %}
+        {{ funktion in [
+          'batterie',
+          'selbsttest_sequentiell',
+          'selbsttest_synchron'
+        ] }}
+      {% elif funktion in ['batteriewarnung', 'rauchalarm'] %}
+        {{ event_device != ''
+           and device_attr(event_device, 'manufacturer') == 'HEIMAN'
+           and device_attr(event_device, 'model') == 'Smoke sensor'
+           and (
+             selected_devices | count == 0
+             or event_device in selected_devices
+           ) }}
+      {% else %}
+        false
+      {% endif %}
+
+
+  ###########################################################################
+  # 1. BATTERIEWARNUNG
+  ###########################################################################
+
+  - if:
+      - condition: template
+        value_template: "{{ funktion == 'batteriewarnung' }}"
+    then:
+      - variables:
+          raum: >-
+            {{ state_attr(event_entity, 'friendly_name')
+               | default(event_entity, true)
+               | replace(' Batteriewarnung', '')
+               | replace('Rauchmelder ', '')
+               | trim }}
+
+      - action: input_text.set_value
+        target:
+          entity_id: "{{ output_entity }}"
+        data:
+          value: >-
+            {{ {
+              "reason": "Rauchmelder Batteriewarnung",
+              "message": raum
+            } | to_json }}
+
+      - stop: Batteriewarnung verarbeitet
+
+
+  ###########################################################################
+  # 2. RAUCHALARM
+  ###########################################################################
+
+  - if:
+      - condition: template
+        value_template: "{{ funktion == 'rauchalarm' }}"
+    then:
+      - variables:
+          raum: >-
+            {{ state_attr(event_entity, 'friendly_name')
+               | default(event_entity, true)
+               | replace(' Rauch', '')
+               | replace('Rauchmelder ', '')
+               | trim }}
+
+      - action: input_text.set_value
+        target:
+          entity_id: "{{ output_entity }}"
+        data:
+          value: >-
+            {{ {
+              "reason": "Rauchmelder Rauchalarm",
+              "message": raum
+            } | to_json }}
+
+      - stop: Rauchalarm verarbeitet
+
+
+  ###########################################################################
+  # 3. BATTERIESTÄNDE
+  ###########################################################################
+
+  - if:
+      - condition: template
+        value_template: "{{ funktion == 'batterie' }}"
+    then:
+      - variables:
+          batterie_sensoren: >-
+            {% set ns = namespace(items=[]) %}
+            {% for e in states.sensor %}
+              {% set dev = device_id(e.entity_id) %}
+              {% if dev is not none
+                    and device_attr(dev, 'manufacturer') == 'HEIMAN'
+                    and device_attr(dev, 'model') == 'Smoke sensor'
+                    and e.attributes.device_class == 'battery'
+                    and e.attributes.unit_of_measurement == '%'
+                    and (
+                      selected_devices | count == 0
+                      or dev in selected_devices
+                    ) %}
+                {% set ns.items = ns.items + [e.entity_id] %}
+              {% endif %}
+            {% endfor %}
+            {{ ns.items }}
+
+      - if:
           - condition: template
-            value_template: >-
-              {% set dev = device_id(trigger.entity_id) %}
-              {{ dev is not none
-                 and device_attr(dev, 'manufacturer') == 'HEIMAN'
-                 and device_attr(dev, 'model') == 'Smoke sensor'
-                 and (
-                   selected_devices | count == 0
-                   or dev in selected_devices
-                 ) }}
-
-        sequence:
-
-          - variables:
-
-              raum: >-
-                {{ state_attr(trigger.entity_id, 'friendly_name')
-                   | default(trigger.entity_id, true)
-                   | replace(' Batteriewarnung', '')
-                   | replace('Rauchmelder ', '')
-                   | trim }}
-
+            value_template: "{{ batterie_sensoren | count == 0 }}"
+        then:
           - action: input_text.set_value
             target:
               entity_id: "{{ output_entity }}"
             data:
               value: >-
                 {{ {
-                  "reason": "Rauchmelder Batteriewarnung",
-                  "message": raum
+                  "reason": "Rauchmelder Batteriestand",
+                  "message": "FEHLER: Keine HEIMAN Rauchmelder gefunden"
                 } | to_json }}
+          - stop: Keine Batterie-Sensoren gefunden
 
+      - repeat:
+          for_each: "{{ batterie_sensoren }}"
+          sequence:
+            - variables:
+                raum: >-
+                  {{ state_attr(repeat.item, 'friendly_name')
+                     | default(repeat.item, true)
+                     | replace(' Batterie', '')
+                     | replace('Rauchmelder ', '')
+                     | trim }}
 
-      #########################################################################
-      # 2. RAUCHALARM AUTOMATISCH
-      #########################################################################
-
-      - conditions:
-
-          - condition: trigger
-            id: smoke_alarm
-
-          - condition: template
-            value_template: >-
-              {% set dev = device_id(trigger.entity_id) %}
-              {{ dev is not none
-                 and device_attr(dev, 'manufacturer') == 'HEIMAN'
-                 and device_attr(dev, 'model') == 'Smoke sensor'
-                 and (
-                   selected_devices | count == 0
-                   or dev in selected_devices
-                 ) }}
-
-        sequence:
-
-          - variables:
-
-              raum: >-
-                {{ state_attr(trigger.entity_id, 'friendly_name')
-                   | default(trigger.entity_id, true)
-                   | replace(' Rauch', '')
-                   | replace('Rauchmelder ', '')
-                   | trim }}
-
-          - action: input_text.set_value
-            target:
-              entity_id: "{{ output_entity }}"
-            data:
-              value: >-
-                {{ {
-                  "reason": "Rauchmelder Rauchalarm",
-                  "message": raum
-                } | to_json }}
-
-
-      #########################################################################
-      # 3. BATTERIESTÄNDE MANUELL AUSLESEN
-      #########################################################################
-
-      - conditions:
-
-          - condition: trigger
-            id: manual_action
-
-          - condition: template
-            value_template: >-
-              {{ trigger.event.data.funktion | default('') == 'batterie' }}
-
-        sequence:
-
-          #####################################################################
-          # BATTERIESENSOREN ERMITTELN
-          #####################################################################
-
-          - variables:
-
-              batterie_sensoren: >-
-                {% set ns = namespace(liste=[]) %}
-
-                {% for entity in states.sensor %}
-
-                  {% set dev = device_id(entity.entity_id) %}
-
-                  {% if dev is not none
-                        and device_attr(dev, 'manufacturer') == 'HEIMAN'
-                        and device_attr(dev, 'model') == 'Smoke sensor'
-                        and state_attr(entity.entity_id, 'device_class')
-                            == 'battery'
-                        and state_attr(
-                              entity.entity_id,
-                              'unit_of_measurement'
-                            ) == '%'
-                        and (
-                          selected_devices | count == 0
-                          or dev in selected_devices
-                        ) %}
-
-                    {% set ns.liste =
-                      ns.liste + [entity.entity_id] %}
-
+                meldung: >-
+                  {% if states(repeat.item)
+                        in ['unknown', 'unavailable'] %}
+                    {{ raum }}: NICHT ERREICHBAR
+                  {% else %}
+                    {{ raum }}: {{ states(repeat.item) }}%
                   {% endif %}
 
-                {% endfor %}
-
-                {{ ns.liste }}
-
-
-          #####################################################################
-          # KEINE SENSORen GEFUNDEN
-          #####################################################################
-
-          - if:
-
-              - condition: template
-                value_template: >-
-                  {{ batterie_sensoren | count == 0 }}
-
-            then:
-
-              - action: input_text.set_value
-                target:
-                  entity_id: "{{ output_entity }}"
-                data:
-                  value: >-
-                    {{ {
-                      "reason": "Rauchmelder Batteriestand",
-                      "message":
-                        "FEHLER: Keine HEIMAN Batterie-Sensoren gefunden"
-                    } | to_json }}
-
-              - stop: Keine Batterie-Sensoren gefunden
-
-
-          #####################################################################
-          # BATTERIEN AUSGEBEN
-          #####################################################################
-
-          - repeat:
-
-              for_each: "{{ batterie_sensoren }}"
-
-              sequence:
-
-                - variables:
-
-                    raum: >-
-                      {{ state_attr(repeat.item, 'friendly_name')
-                         | default(repeat.item, true)
-                         | replace(' Batterie', '')
-                         | replace('Rauchmelder ', '')
-                         | trim }}
-
-                    meldung: >-
-                      {% if states(repeat.item)
-                            in ['unknown', 'unavailable'] %}
-
-                        {{ raum }}: NICHT ERREICHBAR
-
-                      {% else %}
-
-                        {{ raum }}: {{ states(repeat.item) }}%
-
-                      {% endif %}
-
-                - action: input_text.set_value
-                  target:
-                    entity_id: "{{ output_entity }}"
-                  data:
-                    value: >-
-                      {{ {
-                        "reason": "Rauchmelder Batteriestand",
-                        "message": meldung
-                      } | to_json }}
-
-                - delay: "00:00:01"
-
-
-      #########################################################################
-      # 4. SELBSTTEST NACHEINANDER
-      #########################################################################
-
-      - conditions:
-
-          - condition: trigger
-            id: manual_action
-
-          - condition: template
-            value_template: >-
-              {{ trigger.event.data.funktion | default('')
-                 == 'selbsttest_sequentiell' }}
-
-        sequence:
-
-          #####################################################################
-          # TEST-BUTTONS ERMITTELN
-          #####################################################################
-
-          - variables:
-
-              smoke_test_buttons: >-
-                {% set ns = namespace(buttons=[]) %}
-
-                {% for entity in states.button %}
-
-                  {% set dev = device_id(entity.entity_id) %}
-
-                  {% if dev is not none
-                        and device_attr(dev, 'manufacturer') == 'HEIMAN'
-                        and device_attr(dev, 'model') == 'Smoke sensor'
-                        and 'selbsttest' in entity.entity_id
-                        and (
-                          selected_devices | count == 0
-                          or dev in selected_devices
-                        ) %}
-
-                    {% set ns.buttons =
-                      ns.buttons + [entity.entity_id] %}
-
-                  {% endif %}
-
-                {% endfor %}
-
-                {{ ns.buttons }}
-
-
-          #####################################################################
-          # KEINE GERÄTE
-          #####################################################################
-
-          - if:
-
-              - condition: template
-                value_template: >-
-                  {{ smoke_test_buttons | count == 0 }}
-
-            then:
-
-              - action: input_text.set_value
-                target:
-                  entity_id: "{{ output_entity }}"
-                data:
-                  value: >-
-                    {{ {
-                      "reason": "Rauchmelder Selbsttest",
-                      "message":
-                        "FEHLER: Keine HEIMAN Rauchmelder gefunden"
-                    } | to_json }}
-
-              - stop: Keine Rauchmelder gefunden
-
-
-          #####################################################################
-          # STARTMELDUNG
-          #####################################################################
-
-          - action: input_text.set_value
-            target:
-              entity_id: "{{ output_entity }}"
-            data:
-              value: >-
-                {{ {
-                  "reason": "Rauchmelder Selbsttest",
-                  "message":
-                    "Gestartet: "
-                    ~ (smoke_test_buttons | count)
-                    ~ " Geräte"
-                } | to_json }}
-
-          - delay: "00:00:01"
-
-
-          #####################################################################
-          # GERÄTE NACHEINANDER TESTEN
-          #####################################################################
-
-          - repeat:
-
-              for_each: "{{ smoke_test_buttons }}"
-
-              sequence:
-
-                - variables:
-
-                    test_button: "{{ repeat.item }}"
-
-                    test_name: >-
-                      {{ state_attr(repeat.item, 'friendly_name')
-                         | default(repeat.item, true)
-                         | replace(' Selbsttest', '')
-                         | replace(
-                             'Heiman smart smoke sensor ',
-                             ''
-                           )
-                         | replace('Rauchmelder ', '')
-                         | replace('Rauchsensor ', '')
-                         | trim }}
-
-                    running_sensor: >-
-                      {% set ns = namespace(entity='') %}
-
-                      {% for entity in states.binary_sensor %}
-
-                        {% if
-                          device_id(entity.entity_id)
-                            == device_id(repeat.item)
-                          and entity.attributes.device_class == 'running'
-                        %}
-
-                          {% set ns.entity = entity.entity_id %}
-
-                        {% endif %}
-
-                      {% endfor %}
-
-                      {{ ns.entity }}
-
-
-                ################################################################
-                # TESTFORTSCHRITT
-                ################################################################
-
+            - action: input_text.set_value
+              target:
+                entity_id: "{{ output_entity }}"
+              data:
+                value: >-
+                  {{ {
+                    "reason": "Rauchmelder Batteriestand",
+                    "message": meldung
+                  } | to_json }}
+
+            - delay: "00:00:01"
+
+      - stop: Batterieabfrage beendet
+
+
+  ###########################################################################
+  # AB HIER NUR SELBSTTEST
+  # Buttons einmal ermitteln und für beide Testarten verwenden
+  ###########################################################################
+
+  - variables:
+      test_buttons: >-
+        {% set ns = namespace(items=[]) %}
+        {% for e in states.button %}
+          {% set dev = device_id(e.entity_id) %}
+          {% if dev is not none
+                and device_attr(dev, 'manufacturer') == 'HEIMAN'
+                and device_attr(dev, 'model') == 'Smoke sensor'
+                and 'selbsttest' in e.entity_id
+                and (
+                  selected_devices | count == 0
+                  or dev in selected_devices
+                ) %}
+            {% set ns.items = ns.items + [e.entity_id] %}
+          {% endif %}
+        {% endfor %}
+        {{ ns.items }}
+
+  - if:
+      - condition: template
+        value_template: "{{ test_buttons | count == 0 }}"
+    then:
+      - action: input_text.set_value
+        target:
+          entity_id: "{{ output_entity }}"
+        data:
+          value: >-
+            {{ {
+              "reason": "Rauchmelder Selbsttest",
+              "message": "FEHLER: Keine HEIMAN Rauchmelder gefunden"
+            } | to_json }}
+      - stop: Keine Rauchmelder gefunden
+
+
+  ###########################################################################
+  # 4. SELBSTTEST NACHEINANDER
+  ###########################################################################
+
+  - if:
+      - condition: template
+        value_template: "{{ funktion == 'selbsttest_sequentiell' }}"
+    then:
+      - action: input_text.set_value
+        target:
+          entity_id: "{{ output_entity }}"
+        data:
+          value: >-
+            {{ {
+              "reason": "Rauchmelder Selbsttest",
+              "message":
+                "Gestartet: " ~ (test_buttons | count) ~ " Geräte"
+            } | to_json }}
+
+      - delay: "00:00:01"
+
+      - repeat:
+          for_each: "{{ test_buttons }}"
+          sequence:
+            - variables:
+                test_button: "{{ repeat.item }}"
+
+                test_name: >-
+                  {{ state_attr(repeat.item, 'friendly_name')
+                     | default(repeat.item, true)
+                     | replace(' Selbsttest', '')
+                     | replace('Heiman smart smoke sensor ', '')
+                     | replace('Rauchmelder ', '')
+                     | replace('Rauchsensor ', '')
+                     | trim }}
+
+                running_sensor: >-
+                  {% set ns = namespace(entity='') %}
+                  {% for e in states.binary_sensor %}
+                    {% if device_id(e.entity_id)
+                          == device_id(repeat.item)
+                          and e.attributes.device_class == 'running' %}
+                      {% set ns.entity = e.entity_id %}
+                    {% endif %}
+                  {% endfor %}
+                  {{ ns.entity }}
+
+            - action: input_text.set_value
+              target:
+                entity_id: "{{ output_entity }}"
+              data:
+                value: >-
+                  {{ {
+                    "reason": "Rauchmelder Selbsttest",
+                    "message":
+                      "Teste "
+                      ~ repeat.index
+                      ~ "/"
+                      ~ (test_buttons | count)
+                      ~ ": "
+                      ~ test_name
+                  } | to_json }}
+
+            - delay: "00:00:01"
+
+            - if:
+                - condition: template
+                  value_template: "{{ running_sensor == '' }}"
+              then:
                 - action: input_text.set_value
                   target:
                     entity_id: "{{ output_entity }}"
@@ -496,29 +390,56 @@ actions:
                       {{ {
                         "reason": "Rauchmelder Selbsttest",
                         "message":
-                          "Teste "
-                          ~ repeat.index
-                          ~ "/"
-                          ~ (smoke_test_buttons | count)
-                          ~ ": "
-                          ~ test_name
+                          test_name
+                          ~ ": FEHLER - Teststatus nicht gefunden"
                       } | to_json }}
 
-                - delay: "00:00:01"
+                - delay: "00:00:05"
 
+              else:
+                - action: button.press
+                  target:
+                    entity_id: "{{ test_button }}"
 
-                ################################################################
-                # RUNNING-SENSOR VORHANDEN?
-                ################################################################
+                - wait_template: "{{ is_state(running_sensor, 'on') }}"
+                  timeout: "00:00:30"
+                  continue_on_timeout: true
 
                 - if:
-
                     - condition: template
-                      value_template: >-
-                        {{ running_sensor == '' }}
-
+                      value_template: "{{ is_state(running_sensor, 'on') }}"
                   then:
+                    - wait_template: "{{ is_state(running_sensor, 'off') }}"
+                      timeout: "00:01:00"
+                      continue_on_timeout: true
 
+                    - if:
+                        - condition: template
+                          value_template: "{{ is_state(running_sensor, 'off') }}"
+                      then:
+                        - action: input_text.set_value
+                          target:
+                            entity_id: "{{ output_entity }}"
+                          data:
+                            value: >-
+                              {{ {
+                                "reason": "Rauchmelder Selbsttest",
+                                "message": test_name ~ ": OK"
+                              } | to_json }}
+                      else:
+                        - action: input_text.set_value
+                          target:
+                            entity_id: "{{ output_entity }}"
+                          data:
+                            value: >-
+                              {{ {
+                                "reason": "Rauchmelder Selbsttest",
+                                "message":
+                                  test_name
+                                  ~ ": FEHLER - Test nicht beendet"
+                              } | to_json }}
+
+                  else:
                     - action: input_text.set_value
                       target:
                         entity_id: "{{ output_entity }}"
@@ -528,469 +449,182 @@ actions:
                             "reason": "Rauchmelder Selbsttest",
                             "message":
                               test_name
-                              ~ ": FEHLER - Teststatus nicht gefunden"
+                              ~ ": FEHLER - Test nicht gestartet"
                           } | to_json }}
 
-                    - delay: "00:00:05"
-
-
-                  else:
-
-                    #############################################################
-                    # TEST STARTEN
-                    #############################################################
-
-                    - action: button.press
-                      target:
-                        entity_id: "{{ test_button }}"
-
-
-                    #############################################################
-                    # AUF START WARTEN
-                    #############################################################
-
-                    - wait_template: >-
-                        {{ is_state(running_sensor, 'on') }}
-                      timeout: "00:00:30"
-                      continue_on_timeout: true
-
-
-                    #############################################################
-                    # TEST GESTARTET?
-                    #############################################################
-
-                    - if:
-
-                        - condition: template
-                          value_template: >-
-                            {{ is_state(running_sensor, 'on') }}
-
-                      then:
-
-                        #########################################################
-                        # AUF TESTENDE WARTEN
-                        #########################################################
-
-                        - wait_template: >-
-                            {{ is_state(running_sensor, 'off') }}
-                          timeout: "00:01:00"
-                          continue_on_timeout: true
-
-
-                        #########################################################
-                        # TEST BEENDET?
-                        #########################################################
-
-                        - if:
-
-                            - condition: template
-                              value_template: >-
-                                {{ is_state(running_sensor, 'off') }}
-
-                          then:
-
-                            - action: input_text.set_value
-                              target:
-                                entity_id: "{{ output_entity }}"
-                              data:
-                                value: >-
-                                  {{ {
-                                    "reason":
-                                      "Rauchmelder Selbsttest",
-                                    "message":
-                                      test_name ~ ": OK"
-                                  } | to_json }}
-
-                          else:
-
-                            - action: input_text.set_value
-                              target:
-                                entity_id: "{{ output_entity }}"
-                              data:
-                                value: >-
-                                  {{ {
-                                    "reason":
-                                      "Rauchmelder Selbsttest",
-                                    "message":
-                                      test_name
-                                      ~ ": FEHLER - Test nicht beendet"
-                                  } | to_json }}
-
-                      else:
-
-                        - action: input_text.set_value
-                          target:
-                            entity_id: "{{ output_entity }}"
-                          data:
-                            value: >-
-                              {{ {
-                                "reason":
-                                  "Rauchmelder Selbsttest",
-                                "message":
-                                  test_name
-                                  ~ ": FEHLER - Test nicht gestartet"
-                              } | to_json }}
-
-                    - delay: "00:00:05"
-
-
-          #####################################################################
-          # ABSCHLUSSMELDUNG
-          #####################################################################
-
-          - action: input_text.set_value
-            target:
-              entity_id: "{{ output_entity }}"
-            data:
-              value: >-
-                {{ {
-                  "reason": "Rauchmelder Selbsttest",
-                  "message":
-                    "Beendet: "
-                    ~ (smoke_test_buttons | count)
-                    ~ " Geräte geprüft"
-                } | to_json }}
-
-
-      #########################################################################
-      # 5. SELBSTTEST SYNCHRON
-      #########################################################################
-
-      - conditions:
-
-          - condition: trigger
-            id: manual_action
-
-          - condition: template
-            value_template: >-
-              {{ trigger.event.data.funktion | default('')
-                 == 'selbsttest_synchron' }}
-
-        sequence:
-
-          #####################################################################
-          # TEST-BUTTONS ERMITTELN
-          #####################################################################
-
-          - variables:
-
-              smoke_test_buttons: >-
-                {% set ns = namespace(buttons=[]) %}
-
-                {% for entity in states.button %}
-
-                  {% set dev = device_id(entity.entity_id) %}
-
-                  {% if dev is not none
-                        and device_attr(dev, 'manufacturer') == 'HEIMAN'
-                        and device_attr(dev, 'model') == 'Smoke sensor'
-                        and 'selbsttest' in entity.entity_id
-                        and (
-                          selected_devices | count == 0
-                          or dev in selected_devices
-                        ) %}
-
-                    {% set ns.buttons =
-                      ns.buttons + [entity.entity_id] %}
-
-                  {% endif %}
-
-                {% endfor %}
-
-                {{ ns.buttons }}
-
-
-          #####################################################################
-          # KEINE GERÄTE
-          #####################################################################
-
-          - if:
-
-              - condition: template
-                value_template: >-
-                  {{ smoke_test_buttons | count == 0 }}
-
-            then:
-
-              - action: input_text.set_value
-                target:
-                  entity_id: "{{ output_entity }}"
-                data:
-                  value: >-
-                    {{ {
-                      "reason": "Rauchmelder Selbsttest",
-                      "message":
-                        "FEHLER: Keine HEIMAN Rauchmelder gefunden"
-                    } | to_json }}
-
-              - stop: Keine Rauchmelder gefunden
-
-
-          #####################################################################
-          # GERÄTELISTE + RUNNING-SENSOREN
-          #####################################################################
-
-          - variables:
-
-              test_devices: >-
-                {% set ns = namespace(devices=[]) %}
-
-                {% for button in smoke_test_buttons %}
-
-                  {% set dev = device_id(button) %}
-                  {% set sensor = namespace(entity='') %}
-
-                  {% for entity in states.binary_sensor %}
-
-                    {% if
-                      device_id(entity.entity_id) == dev
-                      and entity.attributes.device_class == 'running'
-                    %}
-
-                      {% set sensor.entity = entity.entity_id %}
-
-                    {% endif %}
-
-                  {% endfor %}
-
-                  {% set name =
-                    state_attr(button, 'friendly_name')
-                    | default(button, true)
-                    | replace(' Selbsttest', '')
-                    | replace(
-                        'Heiman smart smoke sensor ',
-                        ''
-                      )
-                    | replace('Rauchmelder ', '')
-                    | replace('Rauchsensor ', '')
-                    | trim
-                  %}
-
-                  {% set ns.devices =
-                    ns.devices + [{
-                      "name": name,
-                      "button": button,
-                      "running": sensor.entity
-                    }] %}
-
-                {% endfor %}
-
-                {{ ns.devices }}
-
-
-          #####################################################################
-          # FEHLENDE RUNNING-SENSOREN
-          #####################################################################
-
-          - variables:
-
-              missing_sensors: >-
-                {% set ns = namespace(names=[]) %}
-
-                {% for item in test_devices %}
-
-                  {% if item.running == '' %}
-
-                    {% set ns.names =
-                      ns.names + [item.name] %}
-
-                  {% endif %}
-
-                {% endfor %}
-
-                {{ ns.names }}
-
-
-          #####################################################################
-          # ABBRUCH BEI FEHLENDEM TESTSTATUS
-          #####################################################################
-
-          - if:
-
-              - condition: template
-                value_template: >-
-                  {{ missing_sensors | count > 0 }}
-
-            then:
-
-              - action: input_text.set_value
-                target:
-                  entity_id: "{{ output_entity }}"
-                data:
-                  value: >-
-                    {{ {
-                      "reason": "Rauchmelder Selbsttest",
-                      "message":
-                        "FEHLER: Teststatus nicht gefunden: "
-                        ~ (missing_sensors | join(", "))
-                    } | to_json }}
-
-              - stop: Teststatus nicht für alle Rauchmelder gefunden
-
-
-          #####################################################################
-          # STARTMELDUNG
-          #####################################################################
-
-          - action: input_text.set_value
-            target:
-              entity_id: "{{ output_entity }}"
-            data:
-              value: >-
-                {{ {
-                  "reason": "Rauchmelder Selbsttest",
-                  "message":
-                    "Gestartet: "
-                    ~ (smoke_test_buttons | count)
-                    ~ " Geräte (synchron)"
-                } | to_json }}
-
-          - delay: "00:00:01"
-
-
-          #####################################################################
-          # STARTZEIT SPEICHERN
-          #####################################################################
-
-          - variables:
-              test_start: "{{ as_timestamp(now()) }}"
-
-
-          #####################################################################
-          # ALLE SELBSTTESTS STARTEN
-          #####################################################################
-
-          - action: button.press
-            target:
-              entity_id: "{{ smoke_test_buttons }}"
-
-
-          - delay: "00:00:02"
-
-
-          #####################################################################
-          # AUF ABSCHLUSS ALLER TESTS WARTEN
-          #####################################################################
-
-          - wait_template: >-
-              {% set ns = namespace(done=true) %}
-
-              {% for item in test_devices %}
-
-                {% if item.running == '' %}
-
-                  {% set ns.done = false %}
-
-                {% elif not is_state(item.running, 'off') %}
-
-                  {% set ns.done = false %}
-
-                {% elif
-                  as_timestamp(
-                    states[item.running].last_changed,
-                    0
-                  )
-                  <= (test_start | float(0))
-                %}
-
-                  {% set ns.done = false %}
-
-                {% endif %}
-
-              {% endfor %}
-
-              {{ ns.done }}
-
-            timeout: "00:01:00"
-            continue_on_timeout: true
-
-
-          #####################################################################
-          # ERGEBNISSE
-          #####################################################################
-
-          - variables:
-
-              test_result: >-
-                {% set ns = namespace(
-                  ok=[],
-                  failed=[]
-                ) %}
-
-                {% for item in test_devices %}
-
-                  {% if
-                    item.running != ''
-                    and is_state(item.running, 'off')
-                    and as_timestamp(
-                      states[item.running].last_changed,
-                      0
-                    ) > (test_start | float(0))
-                  %}
-
-                    {% set ns.ok =
-                      ns.ok + [item.name] %}
-
-                  {% else %}
-
-                    {% set ns.failed =
-                      ns.failed + [item.name] %}
-
-                  {% endif %}
-
-                {% endfor %}
-
-                {{ {
-                  "ok": ns.ok,
-                  "failed": ns.failed
-                } }}
-
-
-          #####################################################################
-          # ABSCHLUSSMELDUNG
-          #####################################################################
-
-          - action: input_text.set_value
-            target:
-              entity_id: "{{ output_entity }}"
-            data:
-              value: >-
-                {% set total = test_devices | count %}
-                {% set ok = test_result.ok | count %}
-
-                {% if ok == total %}
-
-                  {{ {
-                    "reason": "Rauchmelder Selbsttest",
-                    "message":
-                      "OK: "
-                      ~ ok
-                      ~ "/"
-                      ~ total
-                      ~ " Rauchmelder erfolgreich getestet"
-                  } | to_json }}
-
-                {% else %}
-
-                  {{ {
-                    "reason": "Rauchmelder Selbsttest",
-                    "message":
-                      "FEHLER: "
-                      ~ ok
-                      ~ "/"
-                      ~ total
-                      ~ " Rauchmelder OK - "
-                      ~ "keine erfolgreiche Rückmeldung: "
-                      ~ (test_result.failed | join(", "))
-                  } | to_json }}
-
-                {% endif %}
+                - delay: "00:00:05"
+
+      - action: input_text.set_value
+        target:
+          entity_id: "{{ output_entity }}"
+        data:
+          value: >-
+            {{ {
+              "reason": "Rauchmelder Selbsttest",
+              "message":
+                "Beendet: "
+                ~ (test_buttons | count)
+                ~ " Geräte geprüft"
+            } | to_json }}
+
+      - stop: Sequentieller Selbsttest beendet
+
+
+  ###########################################################################
+  # 5. SELBSTTEST SYNCHRON
+  ###########################################################################
+
+  - variables:
+      test_devices: >-
+        {% set ns = namespace(items=[]) %}
+        {% for button in test_buttons %}
+          {% set dev = device_id(button) %}
+          {% set rs = namespace(entity='') %}
+
+          {% for e in states.binary_sensor %}
+            {% if device_id(e.entity_id) == dev
+                  and e.attributes.device_class == 'running' %}
+              {% set rs.entity = e.entity_id %}
+            {% endif %}
+          {% endfor %}
+
+          {% set name =
+            state_attr(button, 'friendly_name')
+            | default(button, true)
+            | replace(' Selbsttest', '')
+            | replace('Heiman smart smoke sensor ', '')
+            | replace('Rauchmelder ', '')
+            | replace('Rauchsensor ', '')
+            | trim
+          %}
+
+          {% set ns.items = ns.items + [{
+            "name": name,
+            "button": button,
+            "running": rs.entity
+          }] %}
+        {% endfor %}
+        {{ ns.items }}
+
+      missing_sensors: >-
+        {% set ns = namespace(names=[]) %}
+        {% for item in test_devices %}
+          {% if item.running == '' %}
+            {% set ns.names = ns.names + [item.name] %}
+          {% endif %}
+        {% endfor %}
+        {{ ns.names }}
+
+  - if:
+      - condition: template
+        value_template: "{{ missing_sensors | count > 0 }}"
+    then:
+      - action: input_text.set_value
+        target:
+          entity_id: "{{ output_entity }}"
+        data:
+          value: >-
+            {{ {
+              "reason": "Rauchmelder Selbsttest",
+              "message":
+                "FEHLER: Teststatus nicht gefunden: "
+                ~ (missing_sensors | join(", "))
+            } | to_json }}
+      - stop: Teststatus nicht für alle Rauchmelder gefunden
+
+  - action: input_text.set_value
+    target:
+      entity_id: "{{ output_entity }}"
+    data:
+      value: >-
+        {{ {
+          "reason": "Rauchmelder Selbsttest",
+          "message":
+            "Gestartet: "
+            ~ (test_buttons | count)
+            ~ " Geräte (synchron)"
+        } | to_json }}
+
+  - delay: "00:00:01"
+
+  - variables:
+      test_start: "{{ as_timestamp(now()) }}"
+
+  - action: button.press
+    target:
+      entity_id: "{{ test_buttons }}"
+
+  - delay: "00:00:02"
+
+  - wait_template: >-
+      {% set ns = namespace(done=true) %}
+      {% for item in test_devices %}
+        {% if item.running == ''
+              or not is_state(item.running, 'off')
+              or as_timestamp(
+                   states[item.running].last_changed, 0
+                 ) <= (test_start | float(0)) %}
+          {% set ns.done = false %}
+        {% endif %}
+      {% endfor %}
+      {{ ns.done }}
+    timeout: "00:01:00"
+    continue_on_timeout: true
+
+  - variables:
+      test_result: >-
+        {% set ns = namespace(ok=[], failed=[]) %}
+        {% for item in test_devices %}
+          {% if item.running != ''
+                and is_state(item.running, 'off')
+                and as_timestamp(
+                     states[item.running].last_changed, 0
+                   ) > (test_start | float(0)) %}
+            {% set ns.ok = ns.ok + [item.name] %}
+          {% else %}
+            {% set ns.failed = ns.failed + [item.name] %}
+          {% endif %}
+        {% endfor %}
+        {{ {"ok": ns.ok, "failed": ns.failed} }}
+
+  - action: input_text.set_value
+    target:
+      entity_id: "{{ output_entity }}"
+    data:
+      value: >-
+        {% set total = test_devices | count %}
+        {% set ok = test_result.ok | count %}
+
+        {% if ok == total %}
+          {{ {
+            "reason": "Rauchmelder Selbsttest",
+            "message":
+              "OK: "
+              ~ ok
+              ~ "/"
+              ~ total
+              ~ " Rauchmelder erfolgreich getestet"
+          } | to_json }}
+        {% else %}
+          {{ {
+            "reason": "Rauchmelder Selbsttest",
+            "message":
+              "FEHLER: "
+              ~ ok
+              ~ "/"
+              ~ total
+              ~ " Rauchmelder OK - "
+              ~ "keine erfolgreiche Rückmeldung: "
+              ~ (test_result.failed | join(", "))
+          } | to_json }}
+        {% endif %}
 
 
 ###############################################################################
-# AUSFÜHRUNGSMODUS
+# Parallel ist nötig, damit ein Rauchalarm nicht auf einen laufenden
+# Selbsttest warten muss. Begrenzung bewusst deutlich kleiner als in v0.2.0.
 ###############################################################################
 
 mode: parallel
-max: 10
+max: 5
 max_exceeded: warning
