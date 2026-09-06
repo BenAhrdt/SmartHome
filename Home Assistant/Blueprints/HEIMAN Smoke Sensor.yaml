@@ -1,5 +1,5 @@
 blueprint:
-  name: HEIMAN Smoke Sensor – Manager
+  name: HEIMAN Smoke Sensor – Manager v0.2.0
   author: Benjamin Schmidt
   description: >
     Zentrale Verwaltung für HEIMAN "Smoke sensor"-Rauchmelder.
