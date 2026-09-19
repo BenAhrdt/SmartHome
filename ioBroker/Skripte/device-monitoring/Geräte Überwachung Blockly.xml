@@ -1,0 +1,350 @@
+v10.1.3
+Blockly
+Javascript
+TypeScript
+Rules
+Skript läuft nicht
+Protokoll
+Ausgewählte Blöcke exportieren
+<xml xmlns="https://developers.google.com/blockly/xml">
+  <variables>
+    <variable id="monitoringData">          monitoringData        </variable>
+  </variables>
+  <block type="on_ext" id="monitoringTrigger" x="50" y="50">
+    <mutation xmlns="http://www.w3.org/1999/xhtml" items="1"></mutation>
+    <field name="CONDITION">ne</field>
+    <field name="ACK_CONDITION"></field>
+    <value name="OID0">
+      <shadow type="field_oid" id="monitoringOid">
+        <field name="oid">device-monitoring.0.info.message</field>
+      </shadow>
+    </value>
+    <statement name="STATEMENT">
+      <block type="variables_set" id="setMonitoringData">
+        <field name="VAR" id="monitoringData">          monitoringData        </field>
+        <value name="VALUE">
+          <block type="convert_json2object" id="parseMonitoringJson">
+            <value name="VALUE">
+              <block type="on_source" id="triggerValue">
+                <field name="ATTR">state.val</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <next>
+          <block type="controls_if" id="checkAlarm">
+            <mutation else="1"></mutation>
+            <value name="IF0">
+              <block type="logic_multi_or" id="g!:Scqqp3P*%V;_]o3V=">
+                <mutation xmlns="http://www.w3.org/1999/xhtml" items="2"></mutation>
+                <value name="OR0">
+                  <block type="logic_compare" id="compareAlarm">
+                    <field name="OP">EQ</field>
+                    <value name="A">
+                      <block type="get_attr" id="getType">
+                        <value name="PATH">
+                          <block type="text" id="DPDeI8I}_C!_8LXNuSv2">
+                            <field name="TEXT">type</field>
+                          </block>
+                        </value>
+                        <value name="OBJECT">
+                          <block type="variables_get" id="getMonitoringDataType">
+                            <field name="VAR" id="monitoringData">          monitoringData        </field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <block type="text" id="alarmText">
+                        <field name="TEXT">alarm</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <value name="OR1">
+                  <block type="logic_compare" id="1!0[P-jWqwDkTxe{@)}(">
+                    <field name="OP">EQ</field>
+                    <value name="A">
+                      <block type="get_attr" id="y;=:8~ZhKb.B@zIq;OD5">
+                        <value name="PATH">
+                          <block type="text" id="cx,vYs=M@qkV6Pr;~eo3">
+                            <field name="TEXT">type</field>
+                          </block>
+                        </value>
+                        <value name="OBJECT">
+                          <block type="variables_get" id="RclTQR,LMdQPgy.kN9F9">
+                            <field name="VAR" id="monitoringData">          monitoringData        </field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <block type="text" id="N*6CUB$5~?Dz,fB$ab#S">
+                        <field name="TEXT">timeout</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <statement name="DO0">
+              <block type="pushover" id="pushoverEmergency">
+                <field name="INSTANCE"></field>
+                <field name="SOUND"></field>
+                <field name="PRIORITY">2</field>
+                <field name="LOG"></field>
+                <field name="FORMAT">none</field>
+                <value name="MESSAGE">
+                  <block type="get_attr" id="getEmergencyMessage">
+                    <value name="PATH">
+                      <block type="text" id="@Gs:LCQl@Ad|?FYo_fr;">
+                        <field name="TEXT">message</field>
+                      </block>
+                    </value>
+                    <value name="OBJECT">
+                      <block type="variables_get" id="getMonitoringDataEmergency">
+                        <field name="VAR" id="monitoringData">          monitoringData        </field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <value name="SOUND_CUSTOM">
+                  <shadow type="text" id="emergencySound">
+                    <field name="TEXT"></field>
+                  </shadow>
+                </value>
+                <value name="TITLE">
+                  <block type="get_attr" id="Js7-rii~(dM#qXC)$rO^">
+                    <value name="PATH">
+                      <block type="text" id="2q},+OdQ*8HvWrr[Out[">
+                        <field name="TEXT">title</field>
+                      </block>
+                    </value>
+                    <value name="OBJECT">
+                      <block type="variables_get" id="/T-H6(|ZnP?Z1H].z[kb">
+                        <field name="VAR" id="monitoringData">          monitoringData        </field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+              </block>
+            </statement>
+            <statement name="ELSE">
+              <block type="pushover" id="pushoverNormal">
+                <field name="INSTANCE"></field>
+                <field name="SOUND"></field>
+                <field name="PRIORITY">0</field>
+                <field name="LOG"></field>
+                <field name="FORMAT">none</field>
+                <value name="MESSAGE">
+                  <block type="get_attr" id="getNormalMessage">
+                    <value name="PATH">
+                      <block type="text" id="=ryEWhNFX`%(vkVD8y?Q">
+                        <field name="TEXT">message</field>
+                      </block>
+                    </value>
+                    <value name="OBJECT">
+                      <block type="variables_get" id="getMonitoringDataNormal">
+                        <field name="VAR" id="monitoringData">          monitoringData        </field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <value name="SOUND_CUSTOM">
+                  <shadow type="text" id="normalSound">
+                    <field name="TEXT"></field>
+                  </shadow>
+                </value>
+                <value name="TITLE">
+                  <block type="get_attr" id="mUP;/w9q`1z}/OTk$Qxh">
+                    <value name="PATH">
+                      <block type="text" id="4EuqWCJTUVxaBjh-,[BC">
+                        <field name="TEXT">title</field>
+                      </block>
+                    </value>
+                    <value name="OBJECT">
+                      <block type="variables_get" id="kRr/=vdSG4T5G4S/3G.~">
+                        <field name="VAR" id="monitoringData">          monitoringData        </field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+              </block>
+            </statement>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>
+<xml xmlns="https://developers.google.com/blockly/xml">
+  <variables>
+    <variable id="monitoringData">          monitoringData        </variable>
+  </variables>
+  <block type="on_ext" id="monitoringTrigger" x="50" y="50">
+    <mutation xmlns="http://www.w3.org/1999/xhtml" items="1"></mutation>
+    <field name="CONDITION">ne</field>
+    <field name="ACK_CONDITION"></field>
+    <value name="OID0">
+      <shadow type="field_oid" id="monitoringOid">
+        <field name="oid">device-monitoring.0.info.message</field>
+      </shadow>
+    </value>
+    <statement name="STATEMENT">
+      <block type="variables_set" id="setMonitoringData">
+        <field name="VAR" id="monitoringData">          monitoringData        </field>
+        <value name="VALUE">
+          <block type="convert_json2object" id="parseMonitoringJson">
+            <value name="VALUE">
+              <block type="on_source" id="triggerValue">
+                <field name="ATTR">state.val</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <next>
+          <block type="controls_if" id="checkAlarm">
+            <mutation else="1"></mutation>
+            <value name="IF0">
+              <block type="logic_multi_or" id="g!:Scqqp3P*%V;_]o3V=">
+                <mutation xmlns="http://www.w3.org/1999/xhtml" items="2"></mutation>
+                <value name="OR0">
+                  <block type="logic_compare" id="compareAlarm">
+                    <field name="OP">EQ</field>
+                    <value name="A">
+                      <block type="get_attr" id="getType">
+                        <value name="PATH">
+                          <block type="text" id="DPDeI8I}_C!_8LXNuSv2">
+                            <field name="TEXT">type</field>
+                          </block>
+                        </value>
+                        <value name="OBJECT">
+                          <block type="variables_get" id="getMonitoringDataType">
+                            <field name="VAR" id="monitoringData">          monitoringData        </field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <block type="text" id="alarmText">
+                        <field name="TEXT">alarm</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <value name="OR1">
+                  <block type="logic_compare" id="1!0[P-jWqwDkTxe{@)}(">
+                    <field name="OP">EQ</field>
+                    <value name="A">
+                      <block type="get_attr" id="y;=:8~ZhKb.B@zIq;OD5">
+                        <value name="PATH">
+                          <block type="text" id="cx,vYs=M@qkV6Pr;~eo3">
+                            <field name="TEXT">type</field>
+                          </block>
+                        </value>
+                        <value name="OBJECT">
+                          <block type="variables_get" id="RclTQR,LMdQPgy.kN9F9">
+                            <field name="VAR" id="monitoringData">          monitoringData        </field>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <block type="text" id="N*6CUB$5~?Dz,fB$ab#S">
+                        <field name="TEXT">timeout</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <statement name="DO0">
+              <block type="pushover" id="pushoverEmergency">
+                <field name="INSTANCE"></field>
+                <field name="SOUND"></field>
+                <field name="PRIORITY">2</field>
+                <field name="LOG"></field>
+                <field name="FORMAT">none</field>
+                <value name="MESSAGE">
+                  <block type="get_attr" id="getEmergencyMessage">
+                    <value name="PATH">
+                      <block type="text" id="@Gs:LCQl@Ad|?FYo_fr;">
+                        <field name="TEXT">message</field>
+                      </block>
+                    </value>
+                    <value name="OBJECT">
+                      <block type="variables_get" id="getMonitoringDataEmergency">
+                        <field name="VAR" id="monitoringData">          monitoringData        </field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <value name="SOUND_CUSTOM">
+                  <shadow type="text" id="emergencySound">
+                    <field name="TEXT"></field>
+                  </shadow>
+                </value>
+                <value name="TITLE">
+                  <block type="get_attr" id="Js7-rii~(dM#qXC)$rO^">
+                    <value name="PATH">
+                      <block type="text" id="2q},+OdQ*8HvWrr[Out[">
+                        <field name="TEXT">title</field>
+                      </block>
+                    </value>
+                    <value name="OBJECT">
+                      <block type="variables_get" id="/T-H6(|ZnP?Z1H].z[kb">
+                        <field name="VAR" id="monitoringData">          monitoringData        </field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+              </block>
+            </statement>
+            <statement name="ELSE">
+              <block type="pushover" id="pushoverNormal">
+                <field name="INSTANCE"></field>
+                <field name="SOUND"></field>
+                <field name="PRIORITY">0</field>
+                <field name="LOG"></field>
+                <field name="FORMAT">none</field>
+                <value name="MESSAGE">
+                  <block type="get_attr" id="getNormalMessage">
+                    <value name="PATH">
+                      <block type="text" id="=ryEWhNFX`%(vkVD8y?Q">
+                        <field name="TEXT">message</field>
+                      </block>
+                    </value>
+                    <value name="OBJECT">
+                      <block type="variables_get" id="getMonitoringDataNormal">
+                        <field name="VAR" id="monitoringData">          monitoringData        </field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <value name="SOUND_CUSTOM">
+                  <shadow type="text" id="normalSound">
+                    <field name="TEXT"></field>
+                  </shadow>
+                </value>
+                <value name="TITLE">
+                  <block type="get_attr" id="mUP;/w9q`1z}/OTk$Qxh">
+                    <value name="PATH">
+                      <block type="text" id="4EuqWCJTUVxaBjh-,[BC">
+                        <field name="TEXT">title</field>
+                      </block>
+                    </value>
+                    <value name="OBJECT">
+                      <block type="variables_get" id="kRr/=vdSG4T5G4S/3G.~">
+                        <field name="VAR" id="monitoringData">          monitoringData        </field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+              </block>
+            </statement>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>
