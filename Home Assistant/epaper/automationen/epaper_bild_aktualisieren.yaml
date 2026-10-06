@@ -1,0 +1,22 @@
+alias: E-Paper Bild aktualisieren
+description: Bildname ändern, Bild konvertieren und Bilderrahmen aktualisieren
+triggers:
+  - trigger: state
+    entity_id: text.wohnzimmer_bilderrahmen_bildname
+conditions:
+  - condition: template
+    value_template: >-
+      {{ trigger.to_state is not none and trigger.from_state is not none
+         and trigger.to_state.state not in ['unknown', 'unavailable', '']
+         and trigger.from_state.state not in ['unknown', 'unavailable', '']
+         and trigger.to_state.state != trigger.from_state.state }}
+actions:
+  - action: shell_command.epaper_convert
+    data:
+      source: >-
+        /config/www/epaper/bilder/{{ trigger.to_state.state }}
+  - delay: {seconds: 2}
+  - action: button.press
+    target:
+      entity_id: button.wohnzimmer_bilderrahmen_e_paper_bild_neu_laden
+mode: restart

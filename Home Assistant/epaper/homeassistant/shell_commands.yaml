@@ -1,0 +1,23 @@
+# In configuration.yaml einfügen oder per !include einbinden.
+shell_command:
+  epaper_convert: >-
+    python3 /config/www/epaper/convert_epaper.py
+    "{{ source }}"
+    /config/www/epaper/current.png
+    /config/www/epaper/current.raw
+
+  epaper_render_muell: >-
+    python3 /config/www/epaper/render_muell.py
+    "{{ typ }}"
+    "{{ datum }}"
+    /config/www/epaper/muell_aktuell.png
+
+  epaper_naechstes_bild: >-
+    python3 /config/www/epaper/naechstes_bild.py
+
+  epaper_render_geburtstag: >-
+    python3 /config/www/epaper/render_geburtstag.py
+    "{{ tage }}"
+    "{{ text }}"
+    "{{ geburtsdatum }}"
+    /config/www/epaper/geburtstag_aktuell.png

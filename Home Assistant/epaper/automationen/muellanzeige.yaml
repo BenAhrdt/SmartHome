@@ -1,0 +1,52 @@
+alias: Bilderrahmen – Müllanzeige
+description: Zeigt ab 19:00 Uhr bei aktiver Abfallerinnerung alle Mülltonnen an, die am nächsten Tag abgeholt werden.
+triggers:
+  - trigger: state
+    entity_id: binary_sensor.abfall_erinnerung_aktiv
+    to: "on"
+    id: muell_an
+  - trigger: state
+    entity_id: binary_sensor.abfall_erinnerung_aktiv
+    to: "off"
+    id: muell_aus
+  - trigger: time
+    at: "19:00:00"
+    id: neunzehn_uhr
+conditions: []
+actions:
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: >-
+              {{ (trigger.id == 'muell_an' and now().hour >= 19)
+                 or (trigger.id == 'neunzehn_uhr' and is_state('binary_sensor.abfall_erinnerung_aktiv', 'on')) }}
+        sequence:
+          - variables:
+              muell_typen: >-
+                {% set ns = namespace(typen=[]) %}
+                {% if states('sensor.abfall_biotonne') | int(999) == 1 %}{% set ns.typen = ns.typen + ['bio'] %}{% endif %}
+                {% if states('sensor.abfall_gelbe_tonne') | int(999) == 1 %}{% set ns.typen = ns.typen + ['gelb'] %}{% endif %}
+                {% if states('sensor.abfall_restabfall') | int(999) == 1 %}{% set ns.typen = ns.typen + ['rest'] %}{% endif %}
+                {% if states('sensor.abfall_altpapier') | int(999) == 1 %}{% set ns.typen = ns.typen + ['blau'] %}{% endif %}
+                {{ ns.typen | join(',') }}
+              abholdatum: >-
+                {{ (now() + timedelta(days=1)).strftime('%d.%m.%Y') }}
+          - condition: template
+            value_template: "{{ muell_typen | trim != '' }}"
+          - action: shell_command.epaper_render_muell
+            data: {typ: "{{ muell_typen | trim }}", datum: "{{ abholdatum }}"}
+          - action: shell_command.epaper_convert
+            data: {source: /config/www/epaper/muell_aktuell.png}
+          - action: button.press
+            target: {entity_id: button.wohnzimmer_bilderrahmen_e_paper_bild_neu_laden}
+      - conditions:
+          - condition: trigger
+            id: muell_aus
+        sequence:
+          - action: shell_command.epaper_convert
+            data:
+              source: >-
+                /config/www/epaper/bilder/{{ states('text.wohnzimmer_bilderrahmen_bildname') }}
+          - action: button.press
+            target: {entity_id: button.wohnzimmer_bilderrahmen_e_paper_bild_neu_laden}
+mode: restart

@@ -1,0 +1,25 @@
+alias: Bilderrahmen – Stündlicher Bildwechsel
+description: Wechselt von 06:00 bis 22:00 Uhr jede volle Stunde zum nächsten Bild. Ab 19:00 Uhr hat eine aktive Müllerinnerung Vorrang.
+triggers:
+  - trigger: time_pattern
+    minutes: "0"
+conditions:
+  - condition: time
+    after: "05:59:59"
+    before: "22:00:01"
+  - condition: template
+    value_template: >-
+      {{ now().hour < 19 or is_state('binary_sensor.abfall_erinnerung_aktiv', 'off') }}
+actions:
+  - action: shell_command.epaper_naechstes_bild
+    response_variable: naechstes_bild
+  - variables:
+      bildname: "{{ naechstes_bild.stdout | trim }}"
+  - condition: template
+    value_template: "{{ bildname != '' }}"
+  - action: text.set_value
+    target:
+      entity_id: text.wohnzimmer_bilderrahmen_bildname
+    data:
+      value: "{{ bildname }}"
+mode: single

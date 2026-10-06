@@ -1,0 +1,178 @@
+substitutions:
+  device_name: bilderrahmen
+  friendly_name: "Bilderrahmen"
+  # An die eigene Home-Assistant-Adresse anpassen.
+  image_base_url: "http://192.168.2.158:8123/local/epaper/"
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  includes:
+    - epaper_raw.h
+  on_boot:
+    priority: -100
+    then:
+      - output.turn_on: battery_enable
+      - delay: 10s
+      - lambda: |-
+          ESP_LOGI("epaper_raw", "Lade current.raw beim Start");
+          bool ok = esphome::epaper_raw::load_raw(id(epaper_display), "${image_base_url}current.raw");
+          if (ok) {
+            ESP_LOGI("epaper_raw", "RAW erfolgreich geladen");
+            id(epaper_display).update();
+          } else {
+            ESP_LOGE("epaper_raw", "RAW konnte nicht geladen werden");
+          }
+
+esp32:
+  board: seeed_xiao_esp32s3
+  framework:
+    type: esp-idf
+    advanced:
+      include_builtin_idf_components:
+        - esp_http_client
+    sdkconfig_options:
+      CONFIG_ESP_CONSOLE_UART_NUM: "0"
+      CONFIG_ESP_CONSOLE_UART_TX_GPIO: "43"
+      CONFIG_ESP_CONSOLE_UART_RX_GPIO: "44"
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+logger:
+  hardware_uart: UART0
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+api:
+  encryption:
+    key: !secret bilderrahmen__encryption_key
+
+ota:
+  - platform: esphome
+
+spi:
+  id: epaper_spi_bus
+  clk_pin: GPIO7
+  mosi_pin: GPIO9
+
+i2c:
+  id: epaper_i2c_bus
+  sda: GPIO19
+  scl: GPIO20
+  scan: true
+
+output:
+  - platform: gpio
+    pin: GPIO21
+    id: battery_enable
+  - platform: gpio
+    pin: GPIO48
+    id: onboard_led_output
+  - platform: ledc
+    pin: GPIO45
+    id: buzzer_pwm
+    frequency: 1000Hz
+
+light:
+  - platform: binary
+    name: "LED"
+    id: onboard_led
+    output: onboard_led_output
+  - platform: monochromatic
+    name: "Buzzer"
+    id: buzzer
+    output: buzzer_pwm
+    default_transition_length: 0s
+
+binary_sensor:
+  - platform: gpio
+    name: "Taste Rechts"
+    id: taste_rechts
+    pin: {number: GPIO3, mode: {input: true, pullup: true}, inverted: true}
+  - platform: gpio
+    name: "Taste Links"
+    id: taste_links
+    pin: {number: GPIO4, mode: {input: true, pullup: true}, inverted: true}
+  - platform: gpio
+    name: "Taste Refresh"
+    id: taste_refresh
+    pin: {number: GPIO5, mode: {input: true, pullup: true}, inverted: true}
+
+sensor:
+  - platform: sht4x
+    i2c_id: epaper_i2c_bus
+    id: sht4x_sensor
+    temperature: {name: "Temperatur", id: epaper_temperatur}
+    humidity: {name: "Luftfeuchtigkeit", id: epaper_luftfeuchtigkeit}
+    update_interval: 60s
+  - platform: adc
+    pin: GPIO1
+    name: "Batteriespannung"
+    id: battery_voltage
+    update_interval: 60s
+    attenuation: 12db
+    filters:
+      - multiply: 2.0
+  - platform: template
+    name: "Batteriestand"
+    id: battery_level
+    unit_of_measurement: "%"
+    icon: "mdi:battery"
+    device_class: battery
+    state_class: measurement
+    lambda: return id(battery_voltage).state;
+    update_interval: 60s
+    filters:
+      - calibrate_linear:
+          - 4.15 -> 100.0
+          - 3.96 -> 90.0
+          - 3.91 -> 80.0
+          - 3.85 -> 70.0
+          - 3.80 -> 60.0
+          - 3.75 -> 50.0
+          - 3.68 -> 40.0
+          - 3.58 -> 30.0
+          - 3.49 -> 20.0
+          - 3.41 -> 10.0
+          - 3.30 -> 5.0
+          - 3.27 -> 0.0
+      - clamp: {min_value: 0, max_value: 100}
+
+text:
+  - platform: template
+    name: "Bildname"
+    id: epaper_bildname
+    optimistic: true
+    restore_value: true
+    initial_value: "Pranger.png"
+    mode: text
+
+display:
+  - platform: epaper_spi
+    id: epaper_display
+    spi_id: epaper_spi_bus
+    model: seeed-reterminal-e1004
+    update_interval: never
+    auto_clear_enabled: false
+    lambda: |-
+      // RAW-Loader befüllt den Framebuffer.
+
+button:
+  - platform: template
+    name: "E-Paper Bild neu laden"
+    id: epaper_reload
+    on_press:
+      then:
+        - lambda: |-
+            ESP_LOGI("epaper_raw", "current.raw wird neu geladen");
+            bool ok = esphome::epaper_raw::load_raw(id(epaper_display), "${image_base_url}current.raw");
+            if (ok) {
+              ESP_LOGI("epaper_raw", "Neues RAW erfolgreich geladen");
+              id(epaper_display).update();
+            } else {
+              ESP_LOGE("epaper_raw", "Neues RAW konnte nicht geladen werden");
+            }

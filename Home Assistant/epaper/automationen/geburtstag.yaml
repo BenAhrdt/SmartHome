@@ -1,0 +1,41 @@
+alias: Bilderrahmen – Geburtstag
+description: Zeigt bevorstehende Geburtstage 1–6 Tage vorher um 17:30, 18:30 und 19:30 Uhr an. Am Geburtstag selbst jede Stunde um xx:30 Uhr. Ab 19:00 Uhr hat Müll Vorrang.
+triggers:
+  - trigger: time_pattern
+    hours: "*"
+    minutes: "30"
+    seconds: "0"
+conditions:
+  - condition: template
+    value_template: >-
+      {{ now().hour < 19 or is_state('binary_sensor.abfall_erinnerung_aktiv', 'off') }}
+actions:
+  - variables:
+      tage: "{{ states('sensor.geburtstag_nachster_tage') | int(999) }}"
+      geburtstag_text: "{{ states('sensor.geburtstag_nachster_text') }}"
+      geburtsdatum: "{{ states('sensor.geburtstag_nachster_geburtsdatum') }}"
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ tage >= 1 and tage <= 6 and now().hour in [17, 18, 19] }}"
+        sequence:
+          - action: shell_command.epaper_render_geburtstag
+            data: {tage: "{{ tage }}", text: "{{ geburtstag_text }}", geburtsdatum: "{{ geburtsdatum }}"}
+          - action: shell_command.epaper_convert
+            data: {source: /config/www/epaper/geburtstag_aktuell.png}
+          - action: button.press
+            target: {entity_id: button.wohnzimmer_bilderrahmen_e_paper_bild_neu_laden}
+      - conditions:
+          - condition: template
+            value_template: "{{ tage == 0 }}"
+          - condition: time
+            after: "06:29:59"
+            before: "21:30:01"
+        sequence:
+          - action: shell_command.epaper_render_geburtstag
+            data: {tage: "{{ tage }}", text: "{{ geburtstag_text }}", geburtsdatum: "{{ geburtsdatum }}"}
+          - action: shell_command.epaper_convert
+            data: {source: /config/www/epaper/geburtstag_aktuell.png}
+          - action: button.press
+            target: {entity_id: button.wohnzimmer_bilderrahmen_e_paper_bild_neu_laden}
+mode: single
